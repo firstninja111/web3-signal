@@ -1,0 +1,57 @@
+$main-bg: #d1e8ff;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+$base-font-family: "Inter", sans-serif;
+$base-font-weight: 400;
+
+// media parameters
+$S-Small: 400px;
+$X-Small: 576px;
+$Small-sm: 576px;
+$Medium-md: 768px;
+$Large-lg: 992px;
+$Extra-large: 1200px;
+$Extra-extra-large: 1400px;
+
+// font sizes
+$font-size-h1: 60px;
+$font-size-h2: 36px;
+$font-size-h3: 32px;
+$font-size-h4: 24px;
+$font-size-h5: 18px;
+$font-size-large: 16px;
+$font-size-medium: 15px;
+$font-size-small: 12px;
+
+// text
+$text-main-color: #777777;
+$text-title-color: #1b6ca2;
+$text-secondary-color: #ef7f1a;
+$text-white-color: #ffffff;
+$work-bg-color: #1f75af;
+$work-text-color: #b3defb;
+$function-bg-color: #f1f6fa;
+
+$icomoon-font-family: "icomoon" !default;
+$icomoon-font-path: "fonts" !default;
+
+$icon-calendarruffle: "\e910";
+$icon-plus: "\e90f";
+$icon-dribble: "\e90c";
+$icon-facebook: "\e90d";
+$icon-github: "\e90e";
+$icon-Chevron-down: "\e90a";
+$icon-Chevron-Right: "\e90b";
+$icon-tiktok-path1: "\e904";
+$icon-tiktok-path2: "\e905";
+$icon-tiktok-path3: "\e906";
+$icon-tiktok-path4: "\e907";
+$icon-tiktok-path5: "\e908";
+$icon-link: "\e900";
+$icon-discord: "\e901";
+$icon-eth: "\e902";
+$icon-instagram: "\e903";
+$icon-twitter: "\e909";

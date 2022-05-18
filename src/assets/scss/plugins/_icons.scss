@@ -1,0 +1,139 @@
+@import "../core/variables";
+
+@font-face {
+  font-family: "icomoon";
+  src: url("../../fonts/icomoon.eot?xu4i8v");
+  src: url("../../fonts/icomoon.eot?xu4i8v#iefix") format("embedded-opentype"),
+    url("../../fonts/icomoon.ttf?xu4i8v") format("truetype"),
+    url("../../fonts/icomoon.woff?xu4i8v") format("woff"),
+    url("../../fonts/icomoon.svg?xu4i8v#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+// @font-face {
+//   font-family: '#{$icomoon-font-family}';
+//   src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?xu4i8v');
+//   src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?xu4i8v#iefix') format('embedded-opentype'),
+//     url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?xu4i8v') format('truetype'),
+//     url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?xu4i8v') format('woff'),
+//     url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?xu4i8v##{$icomoon-font-family}') format('svg');
+//   font-weight: normal;
+//   font-style: normal;
+//   font-display: block;
+// }
+
+i {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "#{$icomoon-font-family}" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-calendarruffle {
+  &:before {
+    content: $icon-calendarruffle;
+    color: #bababa;
+  }
+}
+.icon-plus {
+  &:before {
+    content: $icon-plus;
+  }
+}
+.icon-dribble {
+  &:before {
+    content: $icon-dribble;
+    color: #9ca3af;
+  }
+}
+.icon-facebook {
+  &:before {
+    content: $icon-facebook;
+    color: #9ca3af;
+  }
+}
+.icon-github {
+  &:before {
+    content: $icon-github;
+    color: #9ca3af;
+  }
+}
+.icon-Chevron-down {
+  &:before {
+    content: $icon-Chevron-down;
+  }
+}
+.icon-Chevron-Right {
+  &:before {
+    content: $icon-Chevron-Right;
+  }
+}
+.icon-tiktok .path1 {
+  &:before {
+    content: $icon-tiktok-path1;
+    color: rgb(0, 242, 234);
+  }
+}
+.icon-tiktok .path2 {
+  &:before {
+    content: $icon-tiktok-path2;
+    margin-left: -0.849609375em;
+    color: rgb(0, 242, 234);
+  }
+}
+.icon-tiktok .path3 {
+  &:before {
+    content: $icon-tiktok-path3;
+    margin-left: -0.849609375em;
+    color: rgb(255, 0, 79);
+  }
+}
+.icon-tiktok .path4 {
+  &:before {
+    content: $icon-tiktok-path4;
+    margin-left: -0.849609375em;
+    color: rgb(255, 0, 79);
+  }
+}
+.icon-tiktok .path5 {
+  &:before {
+    content: $icon-tiktok-path5;
+    margin-left: -0.849609375em;
+    color: rgb(0, 0, 0);
+  }
+}
+.icon-link {
+  &:before {
+    content: $icon-link;
+  }
+}
+.icon-discord {
+  &:before {
+    content: $icon-discord;
+  }
+}
+.icon-eth {
+  &:before {
+    content: $icon-eth;
+  }
+}
+.icon-instagram {
+  &:before {
+    content: $icon-instagram;
+  }
+}
+.icon-twitter {
+  &:before {
+    content: $icon-twitter;
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "name": "react-tailwindcss-sass",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@coinbase/wallet-sdk": "^3.0.12",
+    "@testing-library/jest-dom": "^5.11.3",
+    "@testing-library/user-event": "^12.1.1",
+    "@walletconnect/web3-provider": "^1.7.8",
+    "@web3-react/types": "8.0.13-beta.0",
+    "dompurify": "^2.3.6",
+    "draft-convert": "^2.1.12",
+    "draft-js": "^0.11.7",
+    "draftjs-to-html": "^0.9.1",
+    "ethers": "^5.6.5",
+    "html-to-draftjs": "^1.5.0",
+    "jest-dom": "^4.0.0",
+    "query-string": "^7.1.1",
+    "react": "18.1.0",
+    "react-color": "^2.19.3",
+    "react-datetime-picker": "^3.5.0",
+    "react-dom": "18.0.0",
+    "react-draft-wysiwyg": "^1.14.7",
+    "react-icomoon": "^2.5.3",
+    "react-notifications": "^1.7.3",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "^5.0.1",
+    "recharts": "^2.1.9",
+    "sass": "^1.51.0",
+    "user-event": "^4.0.0",
+    "web3": "^1.7.3",
+    "web3modal": "^1.9.7",
+    "websocket-extensions": "^0.1.4",
+    "yargs-parser": "^19.0.1",
+    "yarn": "^1.22.4"
+  },
+  "scripts": {
+    "build:tailwindcss": "postcss src/index.css -o src/assets/css/tailwind.css",
+    "watch:tailwindcss": "postcss src/index.css -o src/assets/css/tailwind.css -w",
+    "start": "yarn build:tailwindcss && react-scripts start",
+    "build": "yarn build:tailwindcss && react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@testing-library/react": "^10.4.8",
+    "autoprefixer": "^9.8.6",
+    "postcss-cli": "^7.1.1",
+    "tailwindcss": "^1.6.2"
+  }
+}

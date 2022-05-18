@@ -1,0 +1,19 @@
+.message {
+  margin-bottom: 40px;
+  &__inner {
+    .input-container {
+      &:not(:last-child) {
+        margin-bottom: 20px;
+      }
+
+      textarea {
+        min-height: 200px;
+        padding: 10px;
+      }
+    }
+  }
+
+  &__wrapper {
+    margin-bottom: 30px;
+  }
+}

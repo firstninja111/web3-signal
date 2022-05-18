@@ -1,0 +1,25 @@
+@import "plugins/_normalize.scss";
+
+@import "core/variables";
+@import "mixins/_center-block.scss";
+
+@import "plugins/_common.scss";
+@import "plugins/_icons.scss";
+@import "plugins/_tailwind.scss";
+
+@import "components/_header.scss";
+@import "components/_sidebar.scss";
+
+@import "pages/_main.scss";
+@import "pages/_info.scss";
+@import "pages/_ethereum.scss";
+@import "pages/_connect-wallet.scss";
+@import "pages/_projects.scss";
+@import "pages/_dashboard.scss";
+@import "pages/_registration.scss";
+@import "pages/_signup.scss";
+@import "pages/_transparenct.scss";
+@import "pages/_team.scss";
+@import "pages/_message.scss";
+@import "pages/_analytics.scss";
+@import "pages/_participants.scss";

@@ -1,0 +1,49 @@
+.transparency {
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+
+    .registration__heading {
+      padding: 0;
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+  }
+
+  &__bottom {
+    .transparency__top {
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    &-text {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      margin-top: 24px;
+
+      span {
+        font-weight: 500;
+        font-size: 12.8px;
+        line-height: 17px;
+        text-decoration-line: underline;
+        color: #9ea0f6;
+        margin-left: 10px;
+      }
+
+      i {
+        margin-left: 10px;
+        color: #9ea0f6;
+      }
+    }
+  }
+}
