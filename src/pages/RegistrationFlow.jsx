@@ -1,18 +1,126 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+
 import Header from "../components/Header";
 import SideBar from "../components/SideBar";
 import trash from "../assets/images/trasher.svg";
 
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import WalletContext from "../context/WalletContext";
+import { useNavigate } from "react-router-dom";
+import { getProjectInfo, createProject, saveProject } from "../service/actions";
+
 const RegistrationFlow = () => {
-  const [swirchInput, setSwitchInput] = useState("");
-  const [swirchInput2, setSwitchInput2] = useState("");
+  const [switchInput, setSwitchInput] = useState("");
+  const [switchInput2, setSwitchInput2] = useState("");
+
+  const { projectId } = useParams();
+  const {account} = useContext(WalletContext);
+  const navigate = useNavigate();
+
+  // form data state
+  const [formData, setformData] = useState({
+    description: '<p></p>'
+  });
+
+  const handleChange = (ev) =>{
+    let _name = ev.target.name;
+    let _val = ev.target.value;
+    setformData({...formData, [_name]: _val});
+  }
+
+  const onSubmit = () => {
+    if(!account){
+      alert('Please login first');
+      return;
+    }
+    
+    const now = new Date();
+
+    if(projectId == undefined){ // Form Submit for Create
+      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+      if(window.confirm('Do you want to create new project?')){
+        createProject(_formData)
+          .then(res=>res.json())
+          .then(res=>{
+            console.log(res);
+            navigate('/projects');
+          })
+      }
+    } else { // Form Submit for Update
+      let _formData = {...formData, "wallet_address": account};
+      if(window.confirm('Do you want to update project info?')){
+        saveProject(projectId, _formData)
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.status == "ok"){
+              alert('Saved successfully');
+            }
+          })
+      }
+    }
+  }
+
+  useEffect(()=>{
+    if(!projectId || projectId == undefined) {
+      setformData({
+        eth_balance: '',
+        c1_nft_address: '',
+        c1_nft_name: '',
+        c1_nft_link: '',
+        c2_nft_address: '',
+        c2_nft_name: '',
+        c2_nft_link: '',
+        twitter_verification: 0,
+        twitter_account: '',
+        confirmation_message: 0,
+        custom_twitter_content: '',
+        discord_verification: 0,
+        server_id: '',
+        sever_name: '',
+        server_link: '',
+        role_display: '',
+        role_label: '',
+        custom_field: '',     
+      });
+      return;
+    }
+    getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{
+      console.log(res);
+      // setProjectInfo(res);
+      setformData({
+        eth_balance: res.eth_balance == 'null' ? '' : res.eth_balance,
+        c1_nft_address: res.c1_nft_address == 'null' ? '' : res.c1_nft_address,
+        c1_nft_name: res.c1_nft_name == 'null' ? '' : res.c1_nft_name,
+        c1_nft_link: res.c1_nft_link == 'null' ? '' : res.c1_nft_link,
+        c2_nft_address: res.c2_nft_address == 'null' ? '' : res.c2_nft_address,
+        c2_nft_name: res.c2_nft_name == 'null' ? '' : res.c2_nft_name,
+        c2_nft_link: res.c1_nft_link == 'null' ? '' : res.c1_nft_link,
+        twitter_verification: res.twitter_verification,
+        twitter_account: res.twitter_account == 'null' ? '' : res.twitter_account,
+        confirmation_message: res.confirmation_message,
+        custom_twitter_content: res.custom_twitter_content == 'null' ? '' : res.custom_twitter_content,
+        discord_verification: res.discord_verification,
+        server_id: res.server_id == 'null' ? '' : res.server_id,
+        sever_name: res.sever_name == 'null' ? '' : res.sever_name,
+        server_link: res.server_link == 'null' ? '' : res.server_link,
+        role_display: res.role_display == 'null' ? '' : res.role_display,
+        role_label: res.role_label == 'null' ? '' : res.role_label,
+        custom_field: res.custom_field == 'null' ? '' : res.custom_field,
+      });
+      setSwitchInput(res.twitter_verification == 1 ? "switcher" : "");
+      setSwitchInput2(res.discord_verification == 1 ? "switcherDS" : "");
+    });
+  }, [projectId]);
+
   return (
     <>
       <Header />
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">
-            <SideBar />
+            <SideBar projectId={projectId}/>
           </div>
           <div className="App__routes">
             <form>
@@ -33,7 +141,7 @@ const RegistrationFlow = () => {
                         Required ETH Balance
                       </div>
                       <div className="input-container__input">
-                        <input type="text" placeholder="Required ETH Balance" />
+                        <input type="text" name="eth_balance" value={formData.eth_balance} placeholder="Required ETH Balance" onChange={handleChange}/>
                       </div>
                       <div className="input-container__subtitle">
                         You can require users who register to hold a minimum
@@ -68,7 +176,10 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input
                               type="text"
+                              name="c1_nft_address"
+                              value={formData.c1_nft_address}
                               placeholder="0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
+                              onChange={handleChange}
                             />
                           </div>
                         </div>
@@ -81,7 +192,10 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input
                               type="text"
+                              name="c1_nft_name"
+                              value={formData.c1_nft_name}
                               placeholder="Bored Ape Yacht Club"
+                              onChange={handleChange}
                             />
                           </div>
                         </div>
@@ -94,7 +208,10 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input
                               type="text"
+                              name="c1_nft_link"
+                              value={formData.c1_nft_link}
                               placeholder="https://opensea.io/collection/boredapeyachtclub"
+                              onChange={handleChange}
                             />
                           </div>
                         </div>
@@ -106,6 +223,66 @@ const RegistrationFlow = () => {
                       </div>
                     </div>
                     <div className="registration__wallet-collection-item">
+                      <div className="registration__wallet-collection-item-wrapper">
+                        <div className="registration__wallet-collection-title">
+                          Collection 2
+                        </div>
+                      </div>
+                      <div className="registration__wallet-collection-item-wrapper">
+                        <div className="input-container">
+                          <div className="input-container__title">
+                            NFT Contract Address
+                          </div>
+                          <div className="input-container__input">
+                            <input
+                              type="text"
+                              name="c2_nft_address"
+                              value={formData.c2_nft_address}
+                              placeholder="0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="registration__wallet-collection-item-wrapper">
+                        <div className="input-container">
+                          <div className="input-container__title">
+                            NFT Collection Name
+                          </div>
+                          <div className="input-container__input">
+                            <input
+                              type="text"
+                              name="c2_nft_name"
+                              value={formData.c2_nft_name}
+                              placeholder="Bored Ape Yacht Club"
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="registration__wallet-collection-item-wrapper">
+                        <div className="input-container">
+                          <div className="input-container__title">
+                            NFT Collection Link
+                          </div>
+                          <div className="input-container__input">
+                            <input
+                              type="text"
+                              name="c2_nft_link"
+                              value={formData.c2_nft_link}
+                              placeholder="https://opensea.io/collection/boredapeyachtclub"
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="registration__wallet-collection-item-wrapper">
+                        <button className="registration__wallet-collection-img">
+                          <img src={trash} alt="" />
+                        </button>
+                      </div>
+                    </div>
+                    {/* <div className="registration__wallet-collection-item">
                       <div className="registration__wallet-collection-item-wrapper">
                         <div className="registration__wallet-collection-title">
                           Collection 1
@@ -155,58 +332,7 @@ const RegistrationFlow = () => {
                           <img src={trash} alt="" />
                         </button>
                       </div>
-                    </div>
-                    <div className="registration__wallet-collection-item">
-                      <div className="registration__wallet-collection-item-wrapper">
-                        <div className="registration__wallet-collection-title">
-                          Collection 1
-                        </div>
-                      </div>
-                      <div className="registration__wallet-collection-item-wrapper">
-                        <div className="input-container">
-                          <div className="input-container__title">
-                            NFT Contract Address
-                          </div>
-                          <div className="input-container__input">
-                            <input
-                              type="text"
-                              placeholder="0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="registration__wallet-collection-item-wrapper">
-                        <div className="input-container">
-                          <div className="input-container__title">
-                            NFT Collection Name
-                          </div>
-                          <div className="input-container__input">
-                            <input
-                              type="text"
-                              placeholder="Bored Ape Yacht Club"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="registration__wallet-collection-item-wrapper">
-                        <div className="input-container">
-                          <div className="input-container__title">
-                            NFT Collection Link
-                          </div>
-                          <div className="input-container__input">
-                            <input
-                              type="text"
-                              placeholder="https://opensea.io/collection/boredapeyachtclub"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="registration__wallet-collection-item-wrapper">
-                        <button className="registration__wallet-collection-img">
-                          <img src={trash} alt="" />
-                        </button>
-                      </div>
-                    </div>
+                    </div> */}
                     <div className="registration__wallet-add">
                       <span>
                         <i className="icon-plus"></i>Add new Collection
@@ -247,19 +373,22 @@ const RegistrationFlow = () => {
                         id="switcher"
                         className="inputSwitch-input"
                         onChange={(n) => {
-                          if (swirchInput) {
+                          if (switchInput) {
                             setSwitchInput("");
+                            setformData({...formData, twitter_verification: 0});
                           } else {
                             setSwitchInput(n.target.id);
+                            setformData({...formData, twitter_verification: 1});
                           }
                         }}
+                        checked={formData.twitter_verification == 1 ? 'checked' : ''}
                       />
                       <label htmlFor="switcher" className="inputSwitch-label">
                         Toggle
                       </label>
                     </div>
                   </div>
-                  {swirchInput === "switcher" ? (
+                  {switchInput === "switcher" ? (
                     <>
                       <div
                         className="input-container"
@@ -269,7 +398,13 @@ const RegistrationFlow = () => {
                           Must Follow
                         </div>
                         <div className="input-container__input">
-                          <input type="text" placeholder="Jack" />
+                          <input 
+                            type="text" 
+                            name="twitter_account"
+                            value={formData.twitter_account}
+                            placeholder="Jack" 
+                            onChange={handleChange}
+                          />
                         </div>
                         <div className="input-container__subtitle">
                           Require that a user follows a certain account before
@@ -278,7 +413,17 @@ const RegistrationFlow = () => {
                       </div>
                       <div className="registration__twitter-check">
                         <div className="registration__twitter-checkbox">
-                          <input type="checkbox" />
+                          <input type="checkbox" 
+                            defaultChecked={formData.confirmation_message == 1 ? 'checked' : ''}
+                            name="confirmation_message"
+                            onChange={(event) => {
+                              if (formData.confirmation_message == 1) {
+                                setformData({...formData, confirmation_message: 0});
+                              } else {
+                                setformData({...formData, confirmation_message: 1});
+                              }
+                            }}
+                          />
                         </div>
                         <div className="registration__twitter-info">
                           <div className="registration__twitter-info-title">
@@ -298,7 +443,10 @@ const RegistrationFlow = () => {
                         <div className="input-container__input">
                           <input
                             type="text"
+                            name="custom_twitter_content"
+                            value={formData.custom_twitter_content}
                             placeholder="Enter custom text for the tweet prompt. We will attach the URL to the end."
+                            onChange={handleChange}
                           />
                         </div>
                         <div className="input-container__subtitle">
@@ -355,19 +503,22 @@ const RegistrationFlow = () => {
                         id="switcherDS"
                         className="inputSwitch-input"
                         onChange={(n) => {
-                          if (swirchInput2) {
+                          if (switchInput2) {
                             setSwitchInput2("");
+                            setformData({...formData, discord_verification: 0});
                           } else {
                             setSwitchInput2(n.target.id);
+                            setformData({...formData, discord_verification: 1});
                           }
                         }}
+                        checked={formData.discord_verification == 1 ? 'checked' : ''}
                       />
                       <label htmlFor="switcherDS" className="inputSwitch-label">
                         Toggle
                       </label>
                     </div>
                   </div>
-                  {swirchInput2 === "switcherDS" ? (
+                  {switchInput2 === "switcherDS" ? (
                     <>
                       <div
                         className="registration__discord-title"
@@ -383,7 +534,13 @@ const RegistrationFlow = () => {
                             Server ID
                           </div>
                           <div className="input-container__input">
-                            <input type="text" placeholder="6827459345" />
+                            <input 
+                              type="text" 
+                              name="server_id"
+                              value={formData.server_id}
+                              placeholder="6827459345" 
+                              onChange={handleChange}
+                            />
                           </div>
                           <div className="input-container__subtitle"></div>
                         </div>
@@ -392,7 +549,13 @@ const RegistrationFlow = () => {
                             Server Display Name
                           </div>
                           <div className="input-container__input">
-                            <input type="text" placeholder="Larva Labs" />
+                            <input 
+                              type="text" 
+                              name="sever_name"
+                              value={formData.sever_name}
+                              placeholder="Larva Labs" 
+                              onChange={handleChange}
+                            />
                           </div>
                           <div className="input-container__subtitle">
                             This will be displayed to the user in the form.
@@ -405,7 +568,10 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input
                               type="text"
+                              name="server_link"
+                              value={formData.server_link}
                               placeholder="https://discord.gg/larvalabs"
+                              onChange={handleChange}
                             />
                           </div>
                           <div className="input-container__subtitle">
@@ -425,7 +591,13 @@ const RegistrationFlow = () => {
                             Role ID(s)
                           </div>
                           <div className="input-container__input">
-                            <input type="text" placeholder="85349583985" />
+                            <input 
+                              type="text" 
+                              name="role_display"
+                              value={formData.role_display}
+                              placeholder="85349583985" 
+                              onChange={handleChange}
+                            />
                           </div>
                           <div className="input-container__subtitle"></div>
                         </div>
@@ -436,7 +608,10 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input
                               type="text"
+                              name="role_label"
+                              value={formData.role_label}
                               placeholder="CryptoPunks Owner"
+                              onChange={handleChange}
                             />
                           </div>
                           <div className="input-container__subtitle">
@@ -484,7 +659,9 @@ const RegistrationFlow = () => {
                         Require user joined your server by a certain date
                       </div>
                       <div className="info__date-content-input">
-                        <input type="date" />
+                        <input 
+                          type="date" 
+                        />
                       </div>
                     </>
                   ) : (
@@ -506,7 +683,13 @@ const RegistrationFlow = () => {
                         Custom Field Label
                       </div>
                       <div className="input-container__input">
-                        <input type="text" placeholder="Custom Field Label" />
+                        <input 
+                          type="text" 
+                          name="custom_field"
+                          value={formData.custom_field}
+                          placeholder="Custom Field Label" 
+                          onChange={handleChange}
+                        />
                       </div>
                       <div className="input-container__subtitle">
                         If you would like users to fill out a custom field (500
@@ -524,7 +707,7 @@ const RegistrationFlow = () => {
                     </button>
                   </div>
                 </div>
-                <button className="registration__btn">Save Settings</button>
+                <button className="registration__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
               </div>
             </form>
           </div>

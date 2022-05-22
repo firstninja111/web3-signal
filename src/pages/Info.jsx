@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import ava from "../assets/images/infoAva.svg";
 import infoBg from "../assets/images/infoBg.png";
@@ -8,14 +8,18 @@ import SideBar from "../components/SideBar";
 import DateTimePicker from "react-datetime-picker";
 import queryString from 'query-string';
 import calendarruffle from "../assets/images/calendarruffle.svg";
-import { getAllProjects, getProjectInfo, saveProject } from "../service/actions";
+import { getAllProjects, getProjectInfo, createProject, saveProject } from "../service/actions";
+import WalletContext from "../context/WalletContext";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { ASSET_BASE } from "../service/config";
 import { convertDateStringToDateTime } from "../service/util";
+import { useNavigate } from "react-router-dom";
 
 const Info = (props) => {
   const { projectId } = useParams();
-  
+  const {account} = useContext(WalletContext);
+  const navigate = useNavigate();
+
   // take draft to get Draft js value
   const [projectInfo, setProjectInfo] = useState({});
   const [draft, setDraft] = useState("");
@@ -70,19 +74,52 @@ const Info = (props) => {
   }
 
   const onSubmit = () => {
-    // console.log('onSubmit ===========', formData, draft);
-    let _formData = {...formData, "description": draftHtml, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
-    saveProject(projectInfo.id, _formData)
-    .then(res=>res.json())
-    .then(res=>{
-      if(res.status == "ok"){
-        alert('Saved successfully');
+    if(!account){
+      alert('Please login first');
+      return;
+    }
+    
+    let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
+
+    if(projectId == undefined){ // Form Submit for Create
+      if(window.confirm('Do you want to create new project?')){
+        createProject(_formData)
+          .then(res=>res.json())
+          .then(res=>{
+            console.log(res);
+            navigate('/projects');
+          })
       }
-    })
+    } else { // Form Submit for Update
+      if(window.confirm('Do you want to update project info?')){
+        saveProject(projectId, _formData)
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.status == "ok"){
+              alert('Saved successfully');
+            }
+          })
+      }
+    }
   }
 
   useEffect(()=>{
-    if(!projectId) {
+    if(!projectId || projectId == undefined) {
+      setFormData({
+        logo: '',
+        cover: '',
+        name: '',
+        slug: '',
+        official_link: '',
+        main_color: '#000000',
+        mint_date: '',
+        mint_time: '',
+        available_mint_spots: '',
+        mint_price: '',
+        raffle_time: new Date(),
+      });
+      setDraft('<p></p>');
+      setContent('<p></p>');
       return;
     }
     getProjectInfo(projectId)
@@ -264,7 +301,7 @@ const Info = (props) => {
                       </div>
                     </div>
                     <div className="info__bottom-btn">
-                      <button type="button" onClick={onSubmit}>Save Settings</button>
+                      <button type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
                     </div>
                   </div>
                 </div>

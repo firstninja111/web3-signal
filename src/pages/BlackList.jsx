@@ -1,16 +1,90 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import SideBar from "../components/SideBar";
 import Title from "../components/Title";
 
+import { useParams } from "react-router-dom";
+import WalletContext from "../context/WalletContext";
+import { useNavigate } from "react-router-dom";
+import { getProjectInfo, createProject, saveProject } from "../service/actions";
+
 const BlackList = () => {
+  const { projectId } = useParams();
+  const {account} = useContext(WalletContext);
+  const navigate = useNavigate();
+
+  // form data state
+  const [formData, setformData] = useState({
+  });
+
+  const handleChange = (ev) =>{
+    let _name = ev.target.name;
+    let _val = ev.target.value;
+    setformData({...formData, [_name]: _val});
+  }
+
+  const onSubmit = () => {
+    if(!account){
+      alert('Please login first');
+      return;
+    }
+    
+    const now = new Date();
+
+    if(projectId == undefined){ // Form Submit for Create
+      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+
+      if(window.confirm('Do you want to create new project?')){
+        createProject(_formData)
+          .then(res=>res.json())
+          .then(res=>{
+            console.log(res);
+            navigate('/projects');
+          })
+      }
+    } else { // Form Submit for Update
+      let _formData = {...formData, "wallet_address": account};
+
+      if(window.confirm('Do you want to update project info?')){
+        saveProject(projectId, _formData)
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.status == "ok"){
+              alert('Saved successfully');
+            }
+          })
+      }
+    }
+  }
+
+  useEffect(()=>{
+    if(!projectId || projectId == undefined) {
+      setformData({
+        banned_ip_hashes: '',
+        banned_wallets: '',
+      });
+      return;
+    }
+    getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{
+      console.log(res);
+      // setProjectInfo(res);
+      setformData({
+        banned_ip_hashes: res.banned_ip_hashes == 'null' ? '' : res.banned_ip_hashes,
+        banned_wallets: res.banned_wallets == 'null' ? '' : res.banned_wallets,
+      });
+    });
+  }, [projectId]);
+
+
   return (
     <>
       <Header />
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">
-            <SideBar />
+            <SideBar projectId={projectId}/>
           </div>
           <div className="App__routes">
             <form>
@@ -26,7 +100,13 @@ const BlackList = () => {
                     <div className="input-container__title">
                       Banned ip hashes
                     </div>
-                    <textarea placeholder="Banned ip hashes" />
+                    <textarea 
+                      name="banned_ip_hashes"
+                      value={formData.banned_ip_hashes}
+                      placeholder="Banned ip hashes" 
+                      onChange={handleChange}>
+                      {formData.banned_ip_hashes}
+                    </textarea>
                     <div className="input-container__subtitle">
                       One per line. These IP address hashes will be marked as
                       banned and be ignored when selecting winners and exporting
@@ -35,7 +115,13 @@ const BlackList = () => {
                   </div>
                   <div className="input-container">
                     <div className="input-container__title">Banned wallets</div>
-                    <textarea placeholder="Banned wallets" />
+                    <textarea 
+                      name="banned_wallets"
+                      value={formData.banned_wallets}
+                      placeholder="Banned wallets" 
+                      onChange={handleChange}>
+                      {formData.banned_wallets}
+                    </textarea>
                     <div className="input-container__subtitle">
                       One per line. These wallet address will be marked as
                       banned and be ignored when selecting winners and exporting
@@ -43,7 +129,7 @@ const BlackList = () => {
                     </div>
                   </div>
                 </div>
-                <button className="signup__btn">Save Settings</button>
+                <button className="signup__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
               </div>
             </form>
           </div>

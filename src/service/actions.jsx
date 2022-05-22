@@ -30,8 +30,8 @@ export const register = (wallet_address) => {
 /** Get project */
 export const getAllProjects = (wallet_address) => {
   let data = new FormData();
-  // data.append('wallet_address', wallet_address);
-  data.append("wallet_address", "0x757c494265270aaEde2751D56Be393925439aC21"); // for only test
+  data.append('wallet_address', wallet_address);
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da"); // for only test
   return fetch(`${API_BASE}/projects`, {
     method: "POST",
     body: data,
@@ -89,6 +89,13 @@ export const getProjectDetail = (slug, address) => {
     body: data,
   });
 };
+
+/** duplicate the project  */
+export const makeDuplicateProject = (projectId) => {
+  return fetch(`${API_BASE}/duplicateproject/${projectId}`, {
+    method: "POST"
+  });
+}
 
 export const getBalance = (address) => {
   return fetch(`${API_BASE}/balance/${address}`);

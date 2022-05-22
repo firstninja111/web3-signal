@@ -10,12 +10,15 @@ import calendarruffle from "../assets/images/calendarruffle.svg";
 import { getAllProjects, getProjectInfo, createProject } from "../service/actions";
 import WalletContext from "../context/WalletContext";
 import { convertDateStringToDateTime } from "../service/util";
+import { useNavigate } from "react-router-dom";
+
 
 const NewInfo = (props) => {
   // take draft to get Draft js value
   const {account} = useContext(WalletContext);
   const [draft, setDraft] = useState("");
   const [draftHtml, setContent] = useState("");
+  const navigate = useNavigate();
 
   // form data state
   const [formData, setFormData] = useState({
@@ -33,6 +36,7 @@ const NewInfo = (props) => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setFormData({...formData, [_name]: _val});
+    console.log(formData);
   }
 
   /** handle file change */
@@ -71,14 +75,18 @@ const NewInfo = (props) => {
       return;
     }
     let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
+    // console.log(_formData);
+    
     createProject(_formData)
-    .then(res=>res.json)
+    .then(res=>res.json())
     .then(res=>{
-      alert('Successfully saved');
-        setFormData({
-          raffle_time: new Date(), 
-          main_color: '#000000'
-      });
+      console.log(res);
+      // alert('Successfully saved');
+      //   setFormData({
+      //     raffle_time: new Date(), 
+      //     main_color: '#000000'
+      // });
+      navigate('/info/' + res.id);
     })
   }
 

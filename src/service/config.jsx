@@ -1,8 +1,8 @@
 const env = "prod";
-// const API_BASE = "https://www.alphaspot.xyz/api";
-// const ASSET_BASE = "https://www.alphaspot.xyz";
-const API_BASE = "http://localhost/api";
-const ASSET_BASE = "http://localhost";
+const API_BASE = "https://www.alphaspot.xyz/api";
+const ASSET_BASE = "https://www.alphaspot.xyz";
+// const API_BASE = "http://localhost/api";
+// const ASSET_BASE = "http://localhost";
 // const API_BASE = "http://local.imagefree.com/api";
 
 const network = {

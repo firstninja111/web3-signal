@@ -15,10 +15,10 @@ const Ethereum = () => {
   return (
     <div className="ethereum__wrapper">
       <Header
-        header={"landing"}
         connectToWalletButton={connectToWalletButton}
         setConnectToWalletButton={setConnectToWalletButton}
         updateStatus={updateStatus}
+        header={true}
       />
       <div className="ethereum">
         <div className="ethereum__img">

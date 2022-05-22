@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.svg";
 import WalletContext from "../context/WalletContext";
-import { connectToWallet } from "../service/walletActions";
+// import { connectToWallet } from "../service/walletActions";
 import * as config from "../service/config";
 import "react-notifications/lib/notifications.css";
+
 
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import WalletConnect from "@walletconnect/web3-provider";
@@ -46,6 +47,8 @@ const Header = (props) => {
     setChainId,
     setWalletText,
     walletText,
+    connected,
+    setConnected,
   } = React.useContext(WalletContext);
 
   const [more, setmore] = useState(false);
@@ -57,7 +60,10 @@ const Header = (props) => {
   const [network, setNetwork] = useState();
 
   const disconnect = async () => {
+    setConnected(false);
+    localStorage.removeItem("connected");
     setAccount(null);
+    localStorage.removeItem("account");
     setChainId(null);
     setWalletText("Sign In");
     setWeb3Instance(null);
@@ -75,7 +81,7 @@ const Header = (props) => {
   }
 
 
-  const connectToWallet = async () => {
+  const connectToWallet = async () => {    
     try {
       const provider = await web3Modal.connect();   // Web3 Modal Instance
       const library = new ethers.providers.Web3Provider(provider);   // Provider of Ethers for Web3
@@ -86,6 +92,7 @@ const Header = (props) => {
       // ======== Signature Part ========= //
       const signer = library.getSigner();
       const accounts = await library.listAccounts();
+      // console.log(updateStatus);
       updateStatus("Signature Request has been sent at " + accounts[0] + ". Please sign and prove the ownership of this address.");
 
       let message = 'Welcome to AlphaSpot! \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give  AlPHASPOT permission to perform any  transactions with your wallet.\n\nWallet address:\n';
@@ -100,16 +107,15 @@ const Header = (props) => {
       try{  // It means that the signature successed...
         const signature = await signer.signMessage(message);
         console.log(signature);  
+        setConnected(true);
+        localStorage.setItem("connected", true);
+        localStorage.setItem("account", accounts[0]);
+
         navigate("/Projects");
-        
       } catch (error) {
         console.log("Signature Error:", error);
         updateStatus(error.message);
       }
-      
-      
-      
-
       // if (accounts) {
       //   setAccount(accounts[0]);
       //   // setNetwork(network);
@@ -125,6 +131,8 @@ const Header = (props) => {
     if (provider?.on) {
       const handleAccountsChanged = (accounts) => {
         setAccount(accounts);
+        localStorage.setItem("account", accounts);
+        
       };
 
       const handleChainChanged = (chainId) => {
@@ -148,6 +156,10 @@ const Header = (props) => {
       };
     }
   }, [provider]);
+
+  useEffect(() => {
+    console.log("Wallet connected: ", connected);
+  }, []);
 
   const ToggleSwitchmore = () => {
     more ? setmore(false) : setmore(true);
@@ -175,17 +187,17 @@ const Header = (props) => {
         <div className="header__top-inner center-block">
           <div className="header__top-left">
             <Link to="/" className="header__top-logo">
-              <img src={logo} alt="" />
+              <img src={logo} alt="" />              
             </Link>
-            {props.header ? (
+            {!connected ? (
               <></>
             ) : (
-              <Link to="/" className="header__top-text">
+              <Link to="/Projects" className="header__top-text">
                 Your Projects
               </Link>
             )}{" "}
           </div>
-          {props.header === "landing" ? (
+          {!connected ? (
             <div className="header__top-right">
               <Link to={"#"} className="header__top-right-btn">
                 Get Started

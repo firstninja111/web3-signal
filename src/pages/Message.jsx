@@ -1,16 +1,98 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import SideBar from "../components/SideBar";
 import Title from "../components/Title";
 
+import { useParams } from "react-router-dom";
+import WalletContext from "../context/WalletContext";
+import { useNavigate } from "react-router-dom";
+import { getProjectInfo, createProject, saveProject } from "../service/actions";
+
 const Message = () => {
+  const { projectId } = useParams();
+  const {account} = useContext(WalletContext);
+  const navigate = useNavigate();
+
+  // form data state
+  const [formData, setformData] = useState({
+  
+  });
+
+  const handleChange = (ev) =>{
+    let _name = ev.target.name;
+    let _val = ev.target.value;
+    setformData({...formData, [_name]: _val});
+  }
+
+  const onSubmit = () => {
+    if(!account){
+      alert('Please login first');
+      return;
+    }
+    
+    const now = new Date();
+
+    if(projectId == undefined){ // Form Submit for Create
+      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+
+      if(window.confirm('Do you want to create new project?')){
+        createProject(_formData)
+          .then(res=>res.json())
+          .then(res=>{
+            console.log(res);
+            navigate('/projects');
+          })
+      }
+    } else { // Form Submit for Update
+      let _formData = {...formData, "wallet_address": account};
+
+      if(window.confirm('Do you want to update project info?')){
+        saveProject(projectId, _formData)
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.status == "ok"){
+              alert('Saved successfully');
+            }
+          })
+      }
+    }
+  }
+
+  useEffect(()=>{
+    if(!projectId || projectId == undefined) {
+      setformData({
+        winner_title: '',
+        winner_message: '',
+        nonwinner_title: '',
+        nonwinner_message: '',
+        waitlist_title: '',
+        waitlist_message: '',
+      });
+      return;
+    }
+    getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{
+      console.log(res);
+      // setProjectInfo(res);
+      setformData({
+        winner_title: res.winner_title == 'null' ? '' : res.winner_title,
+        winner_message: res.winner_message == 'null' ? '' : res.winner_message,
+        nonwinner_title: res.nonwinner_title == 'null' ? '' : res.nonwinner_title,
+        nonwinner_message: res.nonwinner_message == 'null' ? '' : res.nonwinner_message,
+        waitlist_title: res.waitlist_title == 'null' ? '' : res.waitlist_title,
+        waitlist_message: res.waitlist_message == 'null' ? '' : res.waitlist_message,
+      });
+    });
+  }, [projectId]);
+
   return (
     <>
       <Header />
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">
-            <SideBar />
+            <SideBar projectId={projectId}/>
           </div>
           <div className="App__routes">
             <form>
@@ -26,7 +108,13 @@ const Message = () => {
                     <div className="input-container">
                       <div className="input-container__title">Winner title</div>
                       <div className="input-container__input">
-                        <input type="text" placeholder="Winner title" />
+                        <input 
+                          type="text" 
+                          name="winner_title"
+                          value={formData.winner_title}
+                          onChange={handleChange}
+                          placeholder="Winner title" 
+                        />
                       </div>
                       <div className="input-container__subtitle">
                         What is the title for your winner section? Default: You
@@ -38,8 +126,11 @@ const Message = () => {
                         Winner message
                       </div>
                       <textarea
-                        placeholder="Banned ip hashes"
+                        placeholder="Winner message"
                         className="input-container__input"
+                        name="winner_message"
+                        value={formData.winner_message}
+                        onChange={handleChange}
                       />
                       <div className="input-container__subtitle">
                         What message would you like to display to wallets that
@@ -61,7 +152,13 @@ const Message = () => {
                         Nonwinner title
                       </div>
                       <div className="input-container__input">
-                        <input type="text" placeholder="Nonwinner title" />
+                        <input 
+                          type="text" 
+                          name="nonwinner_title"
+                          value={formData.nonwinner_title}
+                          onChange={handleChange}
+                          placeholder="Nonwinner title" 
+                        />
                       </div>
                       <div className="input-container__subtitle">
                         What is the title for your non-winner section? Default:
@@ -75,6 +172,9 @@ const Message = () => {
                       <textarea
                         placeholder="Nonwinner message"
                         className="input-container__input"
+                        name="nonwinner_message"
+                        value={formData.nonwinner_message}
+                        onChange={handleChange}
                       />
                       <div className="input-container__subtitle">
                         What message would you like to display to wallets that
@@ -96,7 +196,13 @@ const Message = () => {
                         Waitlist title
                       </div>
                       <div className="input-container__input">
-                        <input type="text" placeholder="Waitlist title" />
+                        <input 
+                          type="text" 
+                          name="waitlist_title"
+                          value={formData.waitlist_title}
+                          onChange={handleChange}
+                          placeholder="Waitlist title" 
+                        />
                       </div>
                       <div className="input-container__subtitle">
                         What is the title for your waitlist section? Default:
@@ -110,6 +216,9 @@ const Message = () => {
                       <textarea
                         placeholder="Waitlist message"
                         className="input-container__input"
+                        name="waitlist_message"
+                        value={formData.waitlist_message}
+                        onChange={handleChange}
                       />
                       <div className="input-container__subtitle">
                         What message would you like to display to wallets that
@@ -118,7 +227,7 @@ const Message = () => {
                     </div>
                   </div>
                 </div>
-                <button className="signup__btn">Save Settings</button>
+                <button className="signup__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
               </div>
             </form>
           </div>

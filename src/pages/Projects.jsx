@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import ava from "../assets/images/ava.svg";
 import {Link} from "react-router-dom";
 import WalletContext from "../context/WalletContext";
-import {getAllProjects, removeProject} from "../service/actions";
+import {getAllProjects, makeDuplicateProject, removeProject} from "../service/actions";
 import {ASSET_BASE} from "../service/config";
 
 const Projects = () => {
@@ -17,7 +17,10 @@ const Projects = () => {
     if (!account) 
       return;
     
+    console.log(account);
+    // account = "0x722bd4163771851b847de0a69cf7190d747c62da";
     getAllProjects(account).then(res => res.json()).then(res => {
+      console.log(res);
       setProjects(res);
     })
   }, [account]);
@@ -31,11 +34,28 @@ const Projects = () => {
   }
 
   const deleteProject = (projectId) => {
-    removeProject(projectId, account).then(res => res.json()).then(res => {
-      if (res.result) {
-        getAllProjects(account);
-      }
-    })
+    if(window.confirm('Do you want to remove this project?')){
+      removeProject(projectId, account).then(res => res.json()).then(res => {
+        if (res.result) {
+          getAllProjects(account).then(res => res.json()).then(res => {
+            setProjects(res);
+          })
+        }
+      })  
+    }
+  }
+
+  const duplicateProject = (projectId) => {
+    if(window.confirm('Do you want to duplicate this project?')){
+      makeDuplicateProject(projectId).then(res => res.json()).then(res => {
+        if(res.status == "success") {
+          alert("Successfully Duplicated");
+          getAllProjects(account).then(res => res.json()).then(res => {
+            setProjects(res);
+          })
+        }
+      })
+    }
   }
 
   return (
@@ -48,6 +68,10 @@ const Projects = () => {
         </div>
         <div className="projects__items">
           <div className="projects__items-title">Active Project</div>
+          {
+            projects.length == 0 &&
+              <div className="projects__items-no-content">There is no project assigned to you for now.</div>
+          }
           {
           projects.map((project, key) => (
             <div className="projects__items-inner"
@@ -111,7 +135,10 @@ const Projects = () => {
                       activedId == project.id ? "active" : ""
                     }`
                   }>
-                    <div className="projects__item-right-select-item">
+                    <div className="projects__item-right-select-item"
+                      onClick={
+                        () => duplicateProject(project.id)
+                    }>
                       Duplicate
                     </div>
                     <div className="projects__item-right-select-item">
@@ -127,8 +154,8 @@ const Projects = () => {
                 </div>
               </div>
             </div>
-          ))
-        } </div>
+          ))} 
+        </div>
         <div className="projects__footer">
           <div className="projects__footer-socials">
             <a href="/">

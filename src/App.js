@@ -28,10 +28,11 @@ import MainBlack from "./pages/MainBlack";
 function App() {
   const location = useLocation();
 
-  const [account, setAccount] = useState(null);
+  const [account, setAccount] = useState(localStorage.getItem("account") == null ? false : localStorage.getItem("account"));
   const [web3Instance, setWeb3Instance] = useState(null);
   const [chainId, setChainId] = useState(null);
   const [walletText, setWalletText] = useState("Connect To Wallet");
+  const [connected, setConnected] = useState(localStorage.getItem("connected") == null ? false : localStorage.getItem("connected"));
 
   return (
     <WalletContext.Provider
@@ -44,6 +45,8 @@ function App() {
         setChainId,
         walletText,
         setWalletText,
+        connected,
+        setConnected,
       }}
     >
       <div className="App">
@@ -51,21 +54,23 @@ function App() {
           <Routes>
             <Route exact path="/" element={<Ethereum />} />
             <Route exact path="/Projects" element={<Projects />} />
-            <Route exact path="/Info/new" element={<NewInfo />} />
+            <Route exact path="/Info/new" element={<Info />} />
             <Route exact path="/Info/:projectId" element={<Info />} />
             <Route exact path="/Dashboard" element={<Dashboard />} />
             <Route exact path="/Ethereum" element={<Ethereum />} />
             <Route exact path="/ConnectWallet" element={<ConnectWallet />} />
-            <Route
-              exact
-              path="/RegistrationFlow"
-              element={<RegistrationFlow />}
-            />
-            <Route exact path="/SignUp" element={<SignUp />} />
-            <Route exact path="/Transparency" element={<Transparency />} />
-            <Route exact path="/Team" element={<Team />} />
-            <Route exact path="/BlackList" element={<BlackList />} />
-            <Route exact path="/Message" element={<Message />} />
+            <Route exact path="/RegistrationFlow/new" element={<RegistrationFlow />}/>
+            <Route exact path="/RegistrationFlow/:projectId" element={<RegistrationFlow />} />
+            <Route exact path="/SignUp/new" element={<SignUp />} />
+            <Route exact path="/SignUp/:projectId" element={<SignUp />} />
+            <Route exact path="/Transparency/new" element={<Transparency />} />
+            <Route exact path="/Transparency/:projectId" element={<Transparency />} />
+            <Route exact path="/Team/new" element={<Team />} />
+            <Route exact path="/Team/:projectId" element={<Team />} />
+            <Route exact path="/BlackList/new" element={<BlackList />} />
+            <Route exact path="/BlackList/:projectId" element={<BlackList />} />
+            <Route exact path="/Message/new" element={<Message />} />
+            <Route exact path="/Message/:projectId" element={<Message />} />
             <Route exact path="/Analytics" element={<Analytics />} />
             <Route exact path="/Main" element={<Main />} />
             <Route exact path="/MainBlack" element={<MainBlack />} />

@@ -8,7 +8,7 @@ import x from "../assets/images/navbar/X-circle.svg";
 import message from "../assets/images/navbar/Mail.svg";
 import { NavLink } from "react-router-dom";
 
-const SideBar = (projectId) => {
+const SideBar = (projectId) => {  
   const [more, setmore] = useState(false);
 
   const ToggleSwitchmore = () => {
@@ -34,26 +34,27 @@ const SideBar = (projectId) => {
   return (
     <div className={`sidebar ${more ? "active" : ""}`}>
       <div className={`sidebar__inner ${more ? "active" : ""}`}>
-        <NavLink to={"/Info/" + projectId !==""?projectId:'new'} className="sidebar__nav">
+        {/* <NavLink to={"/Info/" + projectId !==""?projectId:'new'} className="sidebar__nav"> */}
+        <NavLink to={projectId.projectId == undefined ? '/info/new' : '/info/' + projectId.projectId} className="sidebar__nav">
           <img src={bookmark} alt="" /> <span>Project Info</span>
         </NavLink>
-        <NavLink to="/RegistrationFlow" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/RegistrationFlow/new' : '/RegistrationFlow/' + projectId.projectId} className="sidebar__nav">
           <img src={cube} alt="" />
           <span> Registration Flow</span>
         </NavLink>
-        <NavLink to="/SignUp" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/SignUp/new' : '/SignUp/' + projectId.projectId} className="sidebar__nav">
           <img src={user} alt="" /> <span>Signup Access</span>
         </NavLink>
-        <NavLink to="/Transparency" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/Transparency/new' : '/Transparency/' + projectId.projectId} className="sidebar__nav">
           <img src={check} alt="" /> <span>Transparency</span>
         </NavLink>
-        <NavLink to="/Team" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/Team/new' : '/Team/' + projectId.projectId} className="sidebar__nav">
           <img src={users} alt="" /> <span>Team</span>
         </NavLink>
-        <NavLink to="/BlackList" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/BlackList/new' : '/BlackList/' + projectId.projectId} className="sidebar__nav">
           <img src={x} alt="" /> <span>Black liste</span>
         </NavLink>
-        <NavLink to="/Message" className="sidebar__nav">
+        <NavLink to={projectId.projectId == undefined ? '/Message/new' : '/Message/' + projectId.projectId} className="sidebar__nav">
           <img src={message} alt="" /> <span>Message</span>
         </NavLink>
       </div>
