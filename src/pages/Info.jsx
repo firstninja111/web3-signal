@@ -28,7 +28,7 @@ const Info = (props) => {
   // form data state
   const [formData, setFormData] = useState({
     raffle_time: new Date(), 
-    main_color: '#000000'
+    main_color: 'white'
   });
 
   /** input date change handler */
@@ -111,7 +111,7 @@ const Info = (props) => {
         name: '',
         slug: '',
         official_link: '',
-        main_color: '#000000',
+        main_color: 'white',
         mint_date: '',
         mint_time: '',
         available_mint_spots: '',
