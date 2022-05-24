@@ -34,6 +34,10 @@ const Info = (props) => {
   /** input date change handler */
   const onDateChange = (_val) => {
     setFormData({...formData, raffle_time: _val});
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  raffle_time: _val};
+    localStorage.setItem("formData", JSON.stringify(object));
   }
 
   /** normal input change handler */
@@ -41,6 +45,10 @@ const Info = (props) => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setFormData({...formData, [_name]: _val});
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  [_name]: _val};
+    localStorage.setItem("formData", JSON.stringify(object));
   }
 
   /** handle file change */
@@ -73,24 +81,29 @@ const Info = (props) => {
     setFormData({...formData, "cover": ev.target.files[0]});
   }
 
+  useEffect(() => {
+    //console.log(formData);
+  }, [formData]);
+
   const onSubmit = () => {
     if(!account){
       alert('Please login first');
       return;
     }
-    
-    let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
-
     if(projectId == undefined){ // Form Submit for Create
+      let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
+      
       if(window.confirm('Do you want to create new project?')){
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
-            console.log(res);
+            //console.log(res);
             navigate('/projects');
           })
       }
     } else { // Form Submit for Update
+      let _formData = {...formData, "wallet_address": account};
+
       if(window.confirm('Do you want to update project info?')){
         saveProject(projectId, _formData)
           .then(res=>res.json())
@@ -101,11 +114,13 @@ const Info = (props) => {
           })
       }
     }
+
+    localStorage.removeItem("formData");
   }
 
   useEffect(()=>{
     if(!projectId || projectId == undefined) {
-      setFormData({
+      var initialObj = {
         logo: '',
         cover: '',
         name: '',
@@ -117,9 +132,17 @@ const Info = (props) => {
         available_mint_spots: '',
         mint_price: '',
         raffle_time: new Date(),
-      });
-      setDraft('<p></p>');
-      setContent('<p></p>');
+      };
+      var storageObject = JSON.parse(localStorage.getItem("formData"));
+      setFormData({...initialObj, ...storageObject});
+
+      if(!storageObject || !storageObject.hasOwnProperty("description")){
+        setDraft('<p></p>');
+        setContent('<p></p>');
+      } else {
+        setDraft(storageObject.description);
+        setContent(storageObject.description);
+      }
       return;
     }
     getProjectInfo(projectId)

@@ -17,10 +17,10 @@ const Projects = () => {
     if (!account) 
       return;
     
-    console.log(account);
+    //console.log(account);
     // account = "0x722bd4163771851b847de0a69cf7190d747c62da";
     getAllProjects(account).then(res => res.json()).then(res => {
-      console.log(res);
+      //console.log(res);
       setProjects(res);
     })
   }, [account]);

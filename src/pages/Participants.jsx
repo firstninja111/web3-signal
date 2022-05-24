@@ -6,7 +6,7 @@ import Title from "../components/Title";
 const Participants = () => {
   const [more, setmore] = useState(false);
   const [tab, setTab] = useState(1);
-  console.log(tab);
+  //console.log(tab);
 
   const ToggleSwitchmore = () => {
     more ? setmore(false) : setmore(true);

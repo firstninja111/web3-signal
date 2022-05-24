@@ -80,9 +80,9 @@ export const removeProject = (projectId, account) => {
 };
 
 /** get project detail with its slug */
-export const getProjectDetail = (slug, address) => {
+export const getProjectDetail = (slug) => {
   let data = new FormData();
-  data.append("wallet_address", address);
+  // data.append("wallet_address", address);
   data.append("slug", slug);
   return fetch(`${API_BASE}/details`, {
     method: "POST",

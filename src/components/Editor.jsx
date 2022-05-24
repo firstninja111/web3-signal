@@ -25,6 +25,10 @@ const DraftEditor = ({ html, setContent }) => {
     setEditorState(state);
     let _html = draftToHtml(convertToRaw(editorState.getCurrentContent()));
     setContent(_html);
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  description: _html};
+    localStorage.setItem("formData", JSON.stringify(object));
   };
 
   return (

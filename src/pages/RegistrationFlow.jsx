@@ -25,8 +25,11 @@ const RegistrationFlow = () => {
   const handleChange = (ev) =>{
     let _name = ev.target.name;
     let _val = ev.target.value;
-    console.log(_name, _val);
     setformData({...formData, [_name]: _val});
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  [_name]: _val};
+    localStorage.setItem("formData", JSON.stringify(object));
   }
 
   const onSubmit = () => {
@@ -38,14 +41,17 @@ const RegistrationFlow = () => {
     const now = new Date();
 
     if(projectId == undefined){ // Form Submit for Create
-      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+      let _formData = {...formData, "wallet_address": account};
+      //console.log(_formData);
+
       if(window.confirm('Do you want to create new project?')){
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
-            console.log(res);
+            //console.log(res);
             navigate('/projects');
           })
+        localStorage.removeItem("formData");
       }
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
@@ -63,7 +69,7 @@ const RegistrationFlow = () => {
 
   useEffect(()=>{
     if(!projectId || projectId == undefined) {
-      setformData({
+      var initialObj = {
         eth_balance: '',
         c1_nft_address: '',
         c1_nft_name: '',
@@ -82,13 +88,18 @@ const RegistrationFlow = () => {
         role_display: '',
         role_label: '',
         custom_field: '',     
-      });
+      };
+      var storageObject = JSON.parse(localStorage.getItem("formData"));
+      setformData({...initialObj, ...storageObject});
+
+      setSwitchInput((!storageObject || !storageObject.hasOwnProperty('twitter_verification') || storageObject.twitter_verification != 1) ? "" : "switcher");
+      setSwitchInput2((!storageObject || !storageObject.hasOwnProperty('discord_verification') || storageObject.discord_verification != 1) ? "" : "switcherDS");
       return;
     }
     getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{
-      console.log(res);
+      //console.log(res);
       // setProjectInfo(res);
       setformData({
         eth_balance: res.eth_balance == 'null' ? '' : res.eth_balance,
@@ -374,13 +385,19 @@ const RegistrationFlow = () => {
                         id="switcher"
                         className="inputSwitch-input"
                         onChange={(n) => {
+                          let _val;
                           if (switchInput) {
                             setSwitchInput("");
                             setformData({...formData, twitter_verification: 0});
+                            _val = 0;
                           } else {
                             setSwitchInput(n.target.id);
                             setformData({...formData, twitter_verification: 1});
+                            _val = 1;
                           }
+                          let storageFormData = JSON.parse(localStorage.getItem("formData"));
+                          const object = {...storageFormData,  twitter_verification: _val};
+                          localStorage.setItem("formData", JSON.stringify(object));
                         }}
                         checked={formData.twitter_verification == 1 ? 'checked' : ''}
                       />
@@ -418,6 +435,7 @@ const RegistrationFlow = () => {
                             defaultChecked={formData.confirmation_message == 1 ? 'checked' : ''}
                             name="confirmation_message"
                             onChange={(event) => {
+                              let _val;
                               if (formData.confirmation_message == 1) {
                                 setformData({...formData, confirmation_message: 0});
                               } else {
@@ -504,13 +522,19 @@ const RegistrationFlow = () => {
                         id="switcherDS"
                         className="inputSwitch-input"
                         onChange={(n) => {
+                          let _val;
                           if (switchInput2) {
                             setSwitchInput2("");
                             setformData({...formData, discord_verification: 0});
+                            _val = 0;
                           } else {
                             setSwitchInput2(n.target.id);
                             setformData({...formData, discord_verification: 1});
+                            _val = 1;
                           }
+                          let storageFormData = JSON.parse(localStorage.getItem("formData"));
+                          const object = {...storageFormData,  discord_verification: _val};
+                          localStorage.setItem("formData", JSON.stringify(object));
                         }}
                         checked={formData.discord_verification == 1 ? 'checked' : ''}
                       />

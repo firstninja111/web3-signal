@@ -36,7 +36,7 @@ const NewInfo = (props) => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setFormData({...formData, [_name]: _val});
-    console.log(formData);
+    //console.log(formData);
   }
 
   /** handle file change */
@@ -75,12 +75,12 @@ const NewInfo = (props) => {
       return;
     }
     let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
-    // console.log(_formData);
+    // //console.log(_formData);
     
     createProject(_formData)
     .then(res=>res.json())
     .then(res=>{
-      console.log(res);
+      //console.log(res);
       // alert('Successfully saved');
       //   setFormData({
       //     raffle_time: new Date(), 

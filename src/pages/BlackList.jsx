@@ -21,6 +21,10 @@ const BlackList = () => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setformData({...formData, [_name]: _val});
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  [_name]: _val};
+    localStorage.setItem("formData", JSON.stringify(object));
   }
 
   const onSubmit = () => {
@@ -32,15 +36,16 @@ const BlackList = () => {
     const now = new Date();
 
     if(projectId == undefined){ // Form Submit for Create
-      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+      let _formData = {...formData, "wallet_address": account};
 
       if(window.confirm('Do you want to create new project?')){
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
-            console.log(res);
+            //console.log(res);
             navigate('/projects');
           })
+        localStorage.removeItem("formData");  
       }
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
@@ -55,20 +60,24 @@ const BlackList = () => {
           })
       }
     }
+    
   }
 
   useEffect(()=>{
     if(!projectId || projectId == undefined) {
-      setformData({
+      var initialObj = {
         banned_ip_hashes: '',
         banned_wallets: '',
-      });
+      };
+      var storageObject = JSON.parse(localStorage.getItem("formData"));
+      setformData({...initialObj, ...storageObject});
+
       return;
     }
     getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{
-      console.log(res);
+      //console.log(res);
       // setProjectInfo(res);
       setformData({
         banned_ip_hashes: res.banned_ip_hashes == 'null' ? '' : res.banned_ip_hashes,

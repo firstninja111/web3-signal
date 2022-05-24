@@ -22,6 +22,10 @@ const Message = () => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setformData({...formData, [_name]: _val});
+
+    let storageFormData = JSON.parse(localStorage.getItem("formData"));
+    const object = {...storageFormData,  [_name]: _val};
+    localStorage.setItem("formData", JSON.stringify(object));
   }
 
   const onSubmit = () => {
@@ -33,15 +37,17 @@ const Message = () => {
     const now = new Date();
 
     if(projectId == undefined){ // Form Submit for Create
-      let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
-
+      let _formData = {...formData, "wallet_address": account};
+      //console.log(_formData);
       if(window.confirm('Do you want to create new project?')){
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
-            console.log(res);
+            //console.log(res);
             navigate('/projects');
           })
+
+        localStorage.removeItem("formData");
       }
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
@@ -60,20 +66,23 @@ const Message = () => {
 
   useEffect(()=>{
     if(!projectId || projectId == undefined) {
-      setformData({
+      var initialObj = {
         winner_title: '',
         winner_message: '',
         nonwinner_title: '',
         nonwinner_message: '',
         waitlist_title: '',
         waitlist_message: '',
-      });
+      };
+
+      var storageObject = JSON.parse(localStorage.getItem("formData"));
+      setformData({...initialObj, ...storageObject});
       return;
     }
     getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{
-      console.log(res);
+      //console.log(res);
       // setProjectInfo(res);
       setformData({
         winner_title: res.winner_title == 'null' ? '' : res.winner_title,

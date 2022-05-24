@@ -92,7 +92,7 @@ const Header = (props) => {
       // ======== Signature Part ========= //
       const signer = library.getSigner();
       const accounts = await library.listAccounts();
-      // console.log(updateStatus);
+      // //console.log(updateStatus);
       updateStatus("Signature Request has been sent at " + accounts[0] + ". Please sign and prove the ownership of this address.");
 
       let message = 'Welcome to AlphaSpot! \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give  AlPHASPOT permission to perform any  transactions with your wallet.\n\nWallet address:\n';
@@ -106,14 +106,14 @@ const Header = (props) => {
 
       try{  // It means that the signature successed...
         const signature = await signer.signMessage(message);
-        console.log(signature);  
+        //console.log(signature);  
         setConnected(true);
         localStorage.setItem("connected", true);
         localStorage.setItem("account", accounts[0]);
 
         navigate("/Projects");
       } catch (error) {
-        console.log("Signature Error:", error);
+        //console.log("Signature Error:", error);
         updateStatus(error.message);
       }
       // if (accounts) {
@@ -158,7 +158,7 @@ const Header = (props) => {
   }, [provider]);
 
   useEffect(() => {
-    console.log("Wallet connected: ", connected);
+    //console.log("Wallet connected: ", connected);
   }, []);
 
   const ToggleSwitchmore = () => {
@@ -212,7 +212,7 @@ const Header = (props) => {
             </div>
           ) : (
             <div className="header__top-right">
-              <Link to={"/Info/new"} className="header__top-right-btn">
+              <Link to={"/Info/new"} className="header__top-right-btn" onClick={()=>{localStorage.removeItem("formData")}}>
                 New project
               </Link>
               <div

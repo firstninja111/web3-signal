@@ -35,12 +35,12 @@ const Transparency = () => {
     // const now = new Date();
 
     // if(projectId == undefined){ // Form Submit for Create
-    //   let _formData = {...formData, "wallet_address": account, "name": "Project " + now.getTime(),"description": "<p></p>"};
+    //   let _formData = {...formData, "wallet_address": account};
     //   if(window.confirm('Do you want to create new project?')){
     //     createProject(_formData)
     //       .then(res=>res.json())
     //       .then(res=>{
-    //         console.log(res);
+    //         //console.log(res);
     //         navigate('/projects');
     //       })
     //   }

@@ -4,27 +4,132 @@ import ttw from "../assets/images/tiktokw.svg";
 import tipndo from "../assets/images/tipndo.png";
 import { getProjectDetail } from "../service/actions";
 import { API_BASE, ASSET_BASE } from "../service/config";
+import ava from "../assets/images/infoAva.svg";
+import infoBg from "../assets/images/infoBg.png";
 
 import { useParams } from "react-router-dom";
 import WalletContext from "../context/WalletContext";
+import { FaTimesCircle } from "react-icons/fa";
+
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
+import WalletConnect from "@walletconnect/web3-provider";
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+
+const providerOptions = {
+  coinbasewallet: {
+    package: CoinbaseWalletSDK,
+    options: {
+      appName: "Web 3 Modal Demo",
+      infuraId: "3fd5925d151b482c8817fd9134d1da50",
+    },
+  },
+  walletconnect: {
+    package: WalletConnect,
+    options: {
+      infuraId: "3fd5925d151b482c8817fd9134d1da50",
+    },
+  },
+};
+
+const web3Modal = new Web3Modal({
+  cacheProvider: true, // optional
+  providerOptions, // required
+});
 
 const Main = () => {
-  const {account} = useContext(WalletContext);
+  const {
+    account,
+    setAccount,
+    setWeb3Instance,
+    web3Instance,
+    chainId,
+    setChainId,
+    setWalletText,
+    walletText,
+    connected,
+    setConnected,
+  } = React.useContext(WalletContext);
+
   const { slug } = useParams();
 
   // form data state
-  const [formData, setformData] = useState({
-
+  const [formData, setformData] = useState({    
   }); 
+  const [provider, setProvider] = useState();
+  const [library, setLibrary] = useState();
+  const [status, updateStatus] = useState('');
 
+
+  //  ========== Wallet Connection and Disconetion part ======== //
+  function generateNonce(length) {
+      var result           = '';
+      var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      var charactersLength = characters.length;
+      for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
+  const connectToWallet = async () => {    
+    try {
+      const provider = await web3Modal.connect();   // Web3 Modal Instance
+      const library = new ethers.providers.Web3Provider(provider);   // Provider of Ethers for Web3
+      setProvider(provider);
+      setLibrary(library);
+
+      // ======== Signature Part ========= //
+      const signer = library.getSigner();
+      const accounts = await library.listAccounts();
+      // //console.log(updateStatus);
+      updateStatus("Signature Request has been sent at " + accounts[0] + ". Please sign and prove the ownership of this address.");
+
+      let message = 'Welcome to AlphaSpot! \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give  AlPHASPOT permission to perform any  transactions with your wallet.\n\nWallet address:\n';
+      if(accounts) {
+        setAccount(accounts[0]);
+        message += accounts[0];
+      } else {
+        message += 'No account selected';
+      }
+      message += '\n\nNonce: ' + generateNonce(32);
+
+      try{  // It means that the signature successed...
+        const signature = await signer.signMessage(message);
+        //console.log(signature);  
+        setConnected(true);
+        localStorage.setItem("connected", true);
+        localStorage.setItem("account", accounts[0]);
+        updateStatus('');
+      } catch (error) {
+        //console.log("Signature Error:", error);
+        updateStatus(error.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const disconnectWallet = () => {
+    setConnected(false);
+    localStorage.removeItem("connected");
+    setAccount(null);
+    localStorage.removeItem("account");
+    setChainId(null);
+    setWalletText("Sign In");
+    setWeb3Instance(null);
+  }
+
+  // ============================================================= //
 
   useEffect(() => {
-    getProjectDetail(slug, account)
+    getProjectDetail(slug)
     .then(res=>res.json())
     .then(res=>{
+      console.log(res);
       if(res.main_color == "black")
       {
-        console.log("black");
+        //console.log("black");
         window.document.getElementsByTagName("html")[0].style.backgroundColor = "black";
       } else {
         window.document.getElementsByTagName("html")[0].style.backgroundColor = "white";
@@ -33,6 +138,12 @@ const Main = () => {
     })
   }, []);
 
+  const getAbbrWalletAddress = (walletAddress) => {
+    let abbrWalletAddress =
+      walletAddress.substring(0, 4) + "..." + walletAddress.substring(38, 42);
+    return abbrWalletAddress.toUpperCase();
+  };
+
   return (
     <div className={`${formData.main_color == 'black' ? 'black' : ''} main`}>
       <div
@@ -40,12 +151,12 @@ const Main = () => {
         style={{ position: "relative", zIndex: "1" }}
       >
         <div className={`${formData.main_color == 'black' ? 'black' : ''} main__logo mobile`}>
-          <img className="img-rounded" src={`${ASSET_BASE + '/' + formData.image}`} alt="" />
+          <img className="img-rounded" src={formData.image ? `${ASSET_BASE}/${formData.image}` : ava} alt="" />
         </div>
         <div className={`${formData.main_color == 'black' ? 'black' : ''} main__content`}>
           <div className={`${formData.main_color == 'black' ? 'black' : ''} main__left`}>
             <div className={`${formData.main_color == 'black' ? 'black' : ''} main__logo`}>
-              <img className="img-rounded" src={`${ASSET_BASE + '/' + formData.image}`} alt="" />
+              <img className="img-rounded" src={formData.image ? `${ASSET_BASE}/${formData.image}` : ava} alt="" />
             </div>
             <div className={`${formData.main_color == 'black' ? 'black' : ''} main__links`}>
               <div className={`${formData.main_color == 'black' ? 'black' : ''} main__links-title`}>{formData.name}</div>
@@ -179,7 +290,7 @@ const Main = () => {
                   style={{ justifyContent: "flex-start" }}
                 >
                   <div className={`${formData.main_color == 'black' ? 'black' : ''} main__right-item-icon`}>
-                    <img className="img-rounded" src={`${ASSET_BASE + '/' + formData.image}`} alt="" />
+                    <img className="img-rounded" src={formData.image ? `${ASSET_BASE}/${formData.image}` : ava} alt="" />
                   </div>
                   <div className={`${formData.main_color == 'black' ? 'black' : ''} main__right-item-info`}>
                     <div className={`${formData.main_color == 'black' ? 'black' : ''} main__right-item-title`}>Azuki</div>
@@ -190,12 +301,27 @@ const Main = () => {
                 </div>
               }
             </div>
-            <button className={`${formData.main_color == 'black' ? 'black' : ''} main__right-btn`}>Connect Wallet</button>
+            {
+              connected &&
+              <div className="main__right-btn" style={{display: 'flex', justifyContent : 'center', fontSize: '20px', alignItems: 'center'}}>
+                <span>{getAbbrWalletAddress(account)}</span>
+                <span style={{marginLeft: '20px', cursor: 'pointer'}} onClick={disconnectWallet}><FaTimesCircle/></span>
+              </div>
+              // <button className={`${formData.main_color == 'black' ? 'black' : ''} main__right-btn`}>{getAbbrWalletAddress(account)}</button>
+            }
+            {
+              !connected &&
+              <div>
+              <button className={`${formData.main_color == 'black' ? 'black' : ''} main__right-btn`} onClick={connectToWallet}>Connect Wallet</button>
+              <p style={{marginTop: '10px'}}>{status}</p>
+              </div>
+            }
+            
           </div>
         </div>
       </div>
       <div className={`${formData.main_color == 'black' ? 'black' : ''} main__bg`}>
-        <img src={`${ASSET_BASE + '/' + formData.banner_image}`} alt="" />
+        <img src={formData.banner_image ? `${ASSET_BASE}/${formData.banner_image}` : infoBg}  alt="" />
       </div>
       <div className={`${formData.main_color == 'black' ? 'black' : ''} main__tipndo`}>
         <div className={`${formData.main_color == 'black' ? 'black' : ''} main__tipndo-img`}>
