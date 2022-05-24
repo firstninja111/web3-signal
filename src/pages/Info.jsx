@@ -225,7 +225,11 @@ const Info = (props) => {
                     </div>
                     <div className="info__link-item">
                       <div className="info__link-title">Main color</div>
-                      <div className="info__link-input">
+                      <select className="info__link-select select" name="main_color" onChange={handleChange}>
+                        <option value="white" selected={formData.main_color == "white"}>White</option>
+                        <option value="black" selected={formData.main_color == "black"}>Black</option>
+                      </select>
+                      {/* <div className="info__link-input">
                         <div className="info__link-input-wrapper">
                           <input
                             type="color" name="main_color"
@@ -234,7 +238,7 @@ const Info = (props) => {
                           />
                         </div>
                         <span>{formData.main_color}</span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                   <div className="info__mint bg">

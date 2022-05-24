@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import Header from "../components/Header";
 import ava from "../assets/images/ava.svg";
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import WalletContext from "../context/WalletContext";
 import {getAllProjects, makeDuplicateProject, removeProject} from "../service/actions";
 import {ASSET_BASE} from "../service/config";
@@ -89,7 +89,15 @@ const Projects = () => {
                   <div className="projects__item-left-content">
                     <div className="projects__item-left-title">
                       {
-                      project.name
+                         <NavLink
+                          to={"/" + project.slug}
+                          className={
+                            (!project.slug || project == "undefined" ? "disabled" : "")
+                          }
+                          target={"_blank"}
+                        >
+                        {project.name}
+                      </NavLink>
                     }</div>
                     <div className="projects__item-left-subtitle">
                       {

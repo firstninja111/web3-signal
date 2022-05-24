@@ -53,6 +53,7 @@ function App() {
         {
           <Routes>
             <Route exact path="/" element={<Ethereum />} />
+            <Route exact path="/:slug" element={<Main />} />
             <Route exact path="/Projects" element={<Projects />} />
             <Route exact path="/Info/new" element={<Info />} />
             <Route exact path="/Info/:projectId" element={<Info />} />

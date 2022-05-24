@@ -25,6 +25,7 @@ const RegistrationFlow = () => {
   const handleChange = (ev) =>{
     let _name = ev.target.name;
     let _val = ev.target.value;
+    console.log(_name, _val);
     setformData({...formData, [_name]: _val});
   }
 
@@ -76,7 +77,7 @@ const RegistrationFlow = () => {
         custom_twitter_content: '',
         discord_verification: 0,
         server_id: '',
-        sever_name: '',
+        server_name: '',
         server_link: '',
         role_display: '',
         role_label: '',
@@ -103,7 +104,7 @@ const RegistrationFlow = () => {
         custom_twitter_content: res.custom_twitter_content == 'null' ? '' : res.custom_twitter_content,
         discord_verification: res.discord_verification,
         server_id: res.server_id == 'null' ? '' : res.server_id,
-        sever_name: res.sever_name == 'null' ? '' : res.sever_name,
+        server_name: res.server_name == 'null' ? '' : res.server_name,
         server_link: res.server_link == 'null' ? '' : res.server_link,
         role_display: res.role_display == 'null' ? '' : res.role_display,
         role_label: res.role_label == 'null' ? '' : res.role_label,
@@ -123,7 +124,7 @@ const RegistrationFlow = () => {
             <SideBar projectId={projectId}/>
           </div>
           <div className="App__routes">
-            <form>
+            
               <div className="registration">
                 <div className="registration__heading">
                   <div className="registration__heading-title">
@@ -551,8 +552,8 @@ const RegistrationFlow = () => {
                           <div className="input-container__input">
                             <input 
                               type="text" 
-                              name="sever_name"
-                              value={formData.sever_name}
+                              name="server_name"
+                              value={formData.server_name}
                               placeholder="Larva Labs" 
                               onChange={handleChange}
                             />
@@ -709,7 +710,7 @@ const RegistrationFlow = () => {
                 </div>
                 <button className="registration__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
               </div>
-            </form>
+            
           </div>
         </div>
       </div>
