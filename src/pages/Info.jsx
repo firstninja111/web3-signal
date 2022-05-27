@@ -45,6 +45,7 @@ const Info = (props) => {
     let _name = ev.target.name;
     let _val = ev.target.value;
     setFormData({...formData, [_name]: _val});
+    console.log(_name, _val);
 
     let storageFormData = JSON.parse(localStorage.getItem("formData"));
     const object = {...storageFormData,  [_name]: _val};
@@ -148,6 +149,7 @@ const Info = (props) => {
     getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{
+      console.log(res);
       setProjectInfo(res);
       setFormData({
         logo: res.image,
@@ -161,6 +163,7 @@ const Info = (props) => {
         available_mint_spots: res.available_mint_spots,
         mint_price: res.mint_price,
         raffle_time: res.raffle_time,
+        collab_only: res.collab_only,
       });
       setDraft(res.description);
       setContent(res.description);
@@ -318,7 +321,14 @@ const Info = (props) => {
                       in your project dashboard for this list to be usable.
                     </div>
                     <div className="info__bottom-input">
-                      <input type="checkbox" name="collab_only" onChange={handleChange}/>
+                      <input type="checkbox" name="collab_only" checked={formData.collab_only == 1 ? 'checked' : ''} onChange={(event)=>{  
+                        const val = event.target.checked ? 1 : 0;
+                        setFormData({...formData, collab_only: val});
+
+                        let storageFormData = JSON.parse(localStorage.getItem("formData"));
+                        const object = {...storageFormData,  collab_only: val};
+                        localStorage.setItem("formData", JSON.stringify(object));
+                      }}/>
                       <div className="info__bottom-input-text">
                         <span>Registration via Collabs Only</span>
                         <span>
