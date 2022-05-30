@@ -31,7 +31,6 @@ export const register = (wallet_address) => {
 export const getAllProjects = (wallet_address) => {
   let data = new FormData();
   data.append('wallet_address', wallet_address);
-  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da"); // for only test
   return fetch(`${API_BASE}/projects`, {
     method: "POST",
     body: data,
@@ -93,10 +92,10 @@ export const getProjectDetail = (slug) => {
 /** Get Stats of project for dashboard */
 export const getStats = (address, slug) => {
   let data = new FormData();
-  // data.append("wallet_address", address);
-  // data.append("slug", slug);
-  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
-  data.append("slug", "devtest");
+  data.append("wallet_address", address);
+  data.append("slug", slug);
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  // data.append("slug", "devtest");
   return fetch(`${API_BASE}/stats`, {
     method: "POST",
     body: data,
@@ -106,10 +105,10 @@ export const getStats = (address, slug) => {
 /** Get Visits of project for dashboard */
 export const getVisits = (address, slug) => {
   let data = new FormData();
-  // data.append("wallet_address", address);
-  // data.append("slug", slug);
-  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
-  data.append("slug", "devtest");
+  data.append("wallet_address", address);
+  data.append("slug", slug);
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  // data.append("slug", "devtest");
   return fetch(`${API_BASE}/visits`, {
     method: "POST",
     body: data,
@@ -138,10 +137,10 @@ export const checknft = (address) => {
 /** Get participants */
 export const getParticipants = async (wallet_address, slug) => {
   let data = new FormData();
-  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
-  data.append("slug", "devtest");
-  // data.append('wallet_address', wallet_address);
-  // data.append('slug', slug);
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  // data.append("slug", "devtest");
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
 
   return await fetch(`${API_BASE}/participants`, {
     method: "POST",
@@ -152,10 +151,10 @@ export const getParticipants = async (wallet_address, slug) => {
 /** Delete Participants */
 export const deleteParticipant = (wallet_address, slug, participant_id) => {
   let data = new FormData();
-  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
-  data.append("slug", "devtest");
-  // data.append('wallet_address', wallet_address);
-  // data.append('slug', slug);
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  // data.append("slug", "devtest");
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
   data.append('participant_id', participant_id);
   
   return fetch(`${API_BASE}/deleteparticipant`, {
