@@ -15,6 +15,7 @@ const RegistrationFlow = () => {
 
   const { projectId } = useParams();
   const {account} = useContext(WalletContext);
+  const [projectInfo, setProjectInfo] = useState({});
   const navigate = useNavigate();
 
   // form data state
@@ -100,7 +101,7 @@ const RegistrationFlow = () => {
     .then(res=>res.json())
     .then(res=>{
       //console.log(res);
-      // setProjectInfo(res);
+      setProjectInfo(res);
       setformData({
         eth_balance: res.eth_balance == 'null' ? '' : res.eth_balance,
         c1_nft_address: res.c1_nft_address == 'null' ? '' : res.c1_nft_address,
@@ -128,7 +129,7 @@ const RegistrationFlow = () => {
 
   return (
     <>
-      <Header />
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">

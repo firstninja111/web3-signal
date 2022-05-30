@@ -12,6 +12,8 @@ const BlackList = () => {
   const { projectId } = useParams();
   const {account} = useContext(WalletContext);
   const navigate = useNavigate();
+  const [projectInfo, setProjectInfo] = useState({});
+
 
   // form data state
   const [formData, setformData] = useState({
@@ -78,7 +80,7 @@ const BlackList = () => {
     .then(res=>res.json())
     .then(res=>{
       //console.log(res);
-      // setProjectInfo(res);
+      setProjectInfo(res);
       setformData({
         banned_ip_hashes: res.banned_ip_hashes == 'null' ? '' : res.banned_ip_hashes,
         banned_wallets: res.banned_wallets == 'null' ? '' : res.banned_wallets,
@@ -89,7 +91,8 @@ const BlackList = () => {
 
   return (
     <>
-      <Header />
+      <Header  projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
+
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">

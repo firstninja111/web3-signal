@@ -12,6 +12,8 @@ const SignUp = () => {
   const { projectId } = useParams();
   const {account} = useContext(WalletContext);
   const navigate = useNavigate();
+  const [projectInfo, setProjectInfo] = useState({});
+
 
   // form data state
   const [formData, setformData] = useState({
@@ -77,7 +79,7 @@ const SignUp = () => {
     .then(res=>{
       //console.log(res);
       
-      // setProjectInfo(res);
+      setProjectInfo(res);
       setformData({
         registration_start_date: res.registration_start_date == null ? '' : res.registration_start_date.substring(0, 10),
         registration_end_date:  res.registration_end_date == null ? '' : res.registration_end_date.substring(0, 10),
@@ -88,7 +90,7 @@ const SignUp = () => {
 
   return (
     <>
-      <Header />
+      <Header projectId={projectId}  header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">

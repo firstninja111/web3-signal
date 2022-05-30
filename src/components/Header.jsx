@@ -264,19 +264,19 @@ const Header = (props) => {
               <i className="icon-Chevron-down"></i>
             </div>
             <div className={`header__bot-nav ${more ? "active" : ""}`}>
-              <NavLink to="/Dashboard" className="header__bot-nav-item">
+              <NavLink to={`/Dashboard/${props.projectId}`} className="header__bot-nav-item">
                 Analytics
               </NavLink>
-              <NavLink to="/Info" className="header__bot-nav-item">
+              <NavLink to={`/Info/${props.projectId}`} className="header__bot-nav-item">
                 Project
               </NavLink>
-              <NavLink to="/Participants" className="header__bot-nav-item">
+              <NavLink to={`/Participants/${props.projectId}`} className="header__bot-nav-item">
                 Participants
               </NavLink>
               {/* <NavLink to="/Analytics" className="header__bot-nav-item">
                 Settings
               </NavLink> */}
-              <NavLink to="/Collabs" className="header__bot-nav-item">
+              <NavLink to={`/Collabs/${props.projectId}`} className="header__bot-nav-item">
                 Collabs
               </NavLink>
               <NavLink

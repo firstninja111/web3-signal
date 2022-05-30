@@ -12,6 +12,8 @@ const Team = () => {
   const { projectId } = useParams();
   const {account} = useContext(WalletContext);
   const navigate = useNavigate();
+  const [projectInfo, setProjectInfo] = useState({});
+
 
   // form data state
   const [formData, setformData] = useState({
@@ -58,7 +60,7 @@ const Team = () => {
 
   return (
     <>
-      <Header />
+      <Header projectId={projectId} header={projectId == undefined}/>
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">

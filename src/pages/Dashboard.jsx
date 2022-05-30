@@ -21,78 +21,158 @@ import trash from "../assets/images/trash.svg";
 import time from "../assets/images/time.svg";
 import users from "../assets/images/userss.svg";
 
+import { useParams } from "react-router-dom";
+import { getProjectInfo, getStats, getParticipants, getVisits, deleteParticipant } from "../service/actions";
+import { useContext, useState, useEffect } from "react";
+import WalletContext from "../context/WalletContext";
+
+
 const Dashboard = () => {
   // pass the correct data for the chart
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
+  const { projectId } = useParams();
+  const {account} = useContext(WalletContext);
+  const [projectInfo, setProjectInfo] = useState({});
+  const [statistics, setStatistics] = useState({});
+  const [data, setData] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [slug, setSlug] = useState();
+
+  const getProjectData = async(projectId) => {
+    let _slug;
+    await getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{      
+      _slug = res.slug;
+    });
+    return _slug;
+  }
+
+  useEffect(() => {
+    
+    if(!projectId || projectId == undefined) {
+      return;
+    }
+    getProjectData(projectId).then(res=>{
+      const _slug = res;
+      getStats(account, _slug).then(res=>res.json())
+      .then(res=>{
+        if(res.status == 'success')
+        { 
+          setStatistics(res[0]);
+        }
+      })
+
+      setSlug(_slug);
+
+      getVisits(account, _slug).then(res=>res.json())
+        .then(res=> {
+          if(res.status == "success")
+          {
+            let i = 0;
+            let _visits = [];
+            while(res.hasOwnProperty(i)){
+              // console.log(res[i]);
+              let graph = {
+                name: res[i].date.substring(0, 10),
+                visites: res[i].number,
+              }
+              _visits.push(graph);
+              i++;
+            }
+            // console.log(_visits);
+            setData(_visits);
+          }
+        })
+
+      getParticipants(account, _slug).then(res=>res.json())
+        .then(res => {
+          if(res.status != "error"){
+            let i = 0;
+            let _participants = [];
+            while(res.hasOwnProperty(i)){
+              _participants.push(res[i]);
+              i++;
+            }
+            setParticipants(_participants);
+          } else {
+            setParticipants([]);
+          }
+        })
+    });
+  }, [projectId]);
+
+  const removeParticipant = (participant_id) => {
+    if(!window.confirm('Do you want to delete participant?'))
+      return;
+      
+    deleteParticipant(account, slug, participant_id).then(res=>res.json())
+      .then(res => {
+         if(res.status == 'true')
+         {
+           window.location.reload();
+         }
+      })
+  }
+
+  // const data = [
+  //   {
+  //     name: "2022-05-12",
+  //     visites: 4,
+  //     // pv: 2400,
+  //     // amt: 2400,
+  //   },
+  //   {
+  //     name: "2022-05-17",
+  //     visites: 2,
+  //     // pv: 1398,
+  //     // amt: 2210,
+  //   },
+  //   {
+  //     name: "2022-05-27",
+  //     visites: 1,
+  //     // pv: 9800,
+  //     // amt: 2290,
+  //   },
+  // ];
+
+  const getAbbrWalletAddress = (walletAddress) => {
+    let abbrWalletAddress =
+      walletAddress.substring(0, 6) + "..." + walletAddress.substring(38, 42);
+    return abbrWalletAddress.toUpperCase();
+  };
+
+  const getDateTimeFormat = (dateTime) => {
+    let abbrDate = 
+      dateTime.substring(0, 10) + " " + dateTime.substring(11, 19);
+
+    return abbrDate;
+  }
 
   return (
     <div className="dashboard">
-      <Header />
+      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
       <div className="dashboard__inner">
         <div className="center-block">
           <div className="dashboard__top">
             <div className="dashboard__top-items">
               <div className="dashboard__top-item">
-                <div className="dashboard__top-item-title">10000</div>
+                <div className="dashboard__top-item-title">{statistics.visites}</div>
                 <div className="dashboard__top-item-subtitle">Visits</div>
               </div>
               <div className="dashboard__top-item">
-                <div className="dashboard__top-item-title">100</div>
+                <div className="dashboard__top-item-title">{statistics.participant}</div>
                 <div className="dashboard__top-item-subtitle">Participants</div>
               </div>
               <div className="dashboard__top-item">
-                <div className="dashboard__top-item-title">24</div>
+                <div className="dashboard__top-item-title">{statistics.referrals}</div>
                 <div className="dashboard__top-item-subtitle">Referrals</div>
               </div>
               <div className="dashboard__top-item">
-                <div className="dashboard__top-item-title">10k</div>
+                <div className="dashboard__top-item-title">{statistics.share}</div>
                 <div className="dashboard__top-item-subtitle">Shares</div>
               </div>
               <div className="dashboard__top-item">
-                <div className="dashboard__top-item-title">5%</div>
+                <div className="dashboard__top-item-title">{statistics.conversions}%</div>
                 <div className="dashboard__top-item-subtitle">
                   Conversion Rate
                 </div>
@@ -122,13 +202,13 @@ const Dashboard = () => {
                       verticalAlign="top"
                       wrapperStyle={{ paddingBottom: "20px" }}
                     />
-                    <Line
+                    {/* <Line
                       type="monotone"
                       dataKey="pv"
                       stroke="#8884d8"
                       activeDot={{ r: 8 }}
-                    />
-                    <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+                    /> */}
+                    <Line type="monotone" dataKey="visites" stroke="#82ca9d" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -252,84 +332,36 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="dashboard__bottom-items">
-              <div className="dashboard__bottom-item">
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">
-                    0x9009...0924
+              {
+                participants.map((participant, key) => {
+                  return <div className="dashboard__bottom-item" key={key}>
+                    <div className="dashboard__bottom-item-inner">
+                      <div className="dashboard__bottom-item-title">
+                        {getAbbrWalletAddress(participant.wallet_address)}
+                      </div>
+                      <div className="dashboard__bottom-item-subtitle">
+                        <img src={time} alt="" /> {getDateTimeFormat(participant.created_at)}
+                      </div>
+                    </div>
+                    <div className="dashboard__bottom-item-inner">
+                      <div className="dashboard__bottom-item-title">{participant.twitter_username}</div>
+                      <div className="dashboard__bottom-item-subtitle">
+                        <img src={users} alt="" />1
+                      </div>
+                    </div>
+                    <div className="dashboard__bottom-item-inner">
+                      <div className="dashboard__bottom-item-link">
+                        {participant.discord_username}
+                      </div>
+                    </div>
+                    <div className="dashboard__bottom-item-inner">
+                      <button className="dashboard__bottom-item-icon" onClick={() => {removeParticipant(participant.id)}}>
+                        <img src={trash} alt="" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={time} alt="" /> 04/20/2022 17:17
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">@Shrinkly1</div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={users} alt="" />1
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-link">
-                    abdelchek#1248
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <button className="dashboard__bottom-item-icon">
-                    <img src={trash} alt="" />
-                  </button>
-                </div>
-              </div>
-              <div className="dashboard__bottom-item">
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">
-                    0x9009...0924
-                  </div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={time} alt="" /> 04/20/2022 17:17
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">@Shrinkly1</div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={users} alt="" />1
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-link">
-                    abdelchek#1248
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <button className="dashboard__bottom-item-icon">
-                    <img src={trash} alt="" />
-                  </button>
-                </div>
-              </div>
-              <div className="dashboard__bottom-item">
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">
-                    0x9009...0924
-                  </div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={time} alt="" /> 04/20/2022 17:17
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-title">@Shrinkly1</div>
-                  <div className="dashboard__bottom-item-subtitle">
-                    <img src={users} alt="" />1
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <div className="dashboard__bottom-item-link">
-                    abdelchek#1248
-                  </div>
-                </div>
-                <div className="dashboard__bottom-item-inner">
-                  <button className="dashboard__bottom-item-icon">
-                    <img src={trash} alt="" />
-                  </button>
-                </div>
-              </div>
+                })
+              }
             </div>
           </div>
         </div>

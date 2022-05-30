@@ -12,6 +12,8 @@ const Message = () => {
   const { projectId } = useParams();
   const {account} = useContext(WalletContext);
   const navigate = useNavigate();
+  const [projectInfo, setProjectInfo] = useState({});
+
 
   // form data state
   const [formData, setformData] = useState({
@@ -83,7 +85,7 @@ const Message = () => {
     .then(res=>res.json())
     .then(res=>{
       //console.log(res);
-      // setProjectInfo(res);
+      setProjectInfo(res);
       setformData({
         winner_title: res.winner_title == 'null' ? '' : res.winner_title,
         winner_message: res.winner_message == 'null' ? '' : res.winner_message,
@@ -97,7 +99,8 @@ const Message = () => {
 
   return (
     <>
-      <Header />
+      <Header  projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
+      
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">

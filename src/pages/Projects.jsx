@@ -5,22 +5,24 @@ import {Link, NavLink} from "react-router-dom";
 import WalletContext from "../context/WalletContext";
 import {getAllProjects, makeDuplicateProject, removeProject} from "../service/actions";
 import {ASSET_BASE} from "../service/config";
+import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
   const [more, setmore] = useState(null);
   const {account} = useContext(WalletContext);
   const [projects, setProjects] = useState([]);
   const [activedId, setActivedId] = useState(0);
+  const navigate = useNavigate();
+  const {
+    slug,
+    setSlug
+  } = React.useContext(WalletContext);
 
   useEffect(() => {
 
     if (!account) 
       return;
-    
-    //console.log(account);
-    // account = "0x722bd4163771851b847de0a69cf7190d747c62da";
     getAllProjects(account).then(res => res.json()).then(res => {
-      //console.log(res);
       setProjects(res);
     })
   }, [account]);
@@ -31,6 +33,12 @@ const Projects = () => {
       return;
     }
     setActivedId(projectId);
+  }
+
+  const editProject = (slug, id) => {
+    setSlug(slug);
+    localStorage.setItem('slug', slug);
+    navigate(`/info/${id}`);
   }
 
   const deleteProject = (projectId) => {
@@ -112,29 +120,29 @@ const Projects = () => {
                     <div className="projects__item-center-title">
                       Participants
                     </div>
-                    <div className="projects__item-center-subtitle">200</div>
+                    <div className="projects__item-center-subtitle">{project.participants_count}</div>
                   </div>
                   <div className="projects__item-center-block">
                     <div className="projects__item-center-title">Referrals</div>
-                    <div className="projects__item-center-subtitle">10</div>
+                    <div className="projects__item-center-subtitle">{project.referrals_count}</div>
                   </div>
                   <div className="projects__item-center-block">
                     <div className="projects__item-center-title">Shares</div>
-                    <div className="projects__item-center-subtitle">10k</div>
+                    <div className="projects__item-center-subtitle">{project.shares_count}</div>
                   </div>
                 </div>
               </div>
               <div className="projects__item">
                 <div className="projects__item-right">
-                  <Link to="/Dashboard" className="projects__item-right-btn">
+                  <Link to={`/Dashboard/${project.id}`} className="projects__item-right-btn">
                     Dashboard
                   </Link>
                   <button className="projects__item-right-dropdown">
-                    <Link to={
-                      "/Info/" + project.id
-                    }>Edit</Link>
+                    <p onClick={() => {editProject(project.slug, project.id)}}>Edit</p>
                     <i onClick={
-                        () => toggleActive(project.id)
+                        () => {
+                          toggleActive(project.id)
+                        }
                       }
                       className="icon-Chevron-down"></i>
                   </button>

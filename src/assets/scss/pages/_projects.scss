@@ -246,7 +246,13 @@
           width: 100%;
           justify-content: flex-end;
         }
-
+        p {
+          padding: 9px 17px;
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 20px;
+          color: #374151;
+        }
         a {
           padding: 9px 17px;
           font-weight: 500;

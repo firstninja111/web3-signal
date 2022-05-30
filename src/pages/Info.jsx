@@ -172,7 +172,7 @@ const Info = (props) => {
   
   return (
     <>
-      <Header slug={projectInfo.slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
 
       <div className="App__inner">
         <div className="App__inner-content center-block">

@@ -24,6 +24,8 @@ import PublicPage from "./pages/PublicPage";
 import WalletContext from "./context/WalletContext";
 import NewInfo from "./pages/NewInfo";
 import MainBlack from "./pages/MainBlack";
+import CollabsNew from "./pages/CollabsNew";  
+import CollabsEdit from "./pages/CollabsEdit";  
 
 function App() {
   const location = useLocation();
@@ -33,6 +35,8 @@ function App() {
   const [chainId, setChainId] = useState(null);
   const [walletText, setWalletText] = useState("Connect To Wallet");
   const [connected, setConnected] = useState(localStorage.getItem("connected") == null ? false : localStorage.getItem("connected"));
+  const [slug, setSlug] = useState(localStorage.getItem("slug") == null ? "invalid" : localStorage.getItem("slug"));
+
 
   return (
     <WalletContext.Provider
@@ -47,6 +51,8 @@ function App() {
         setWalletText,
         connected,
         setConnected,
+        slug, 
+        setSlug,
       }}
     >
       <div className="App">
@@ -57,7 +63,7 @@ function App() {
             <Route exact path="/Projects" element={<Projects />} />
             <Route exact path="/Info/new" element={<Info />} />
             <Route exact path="/Info/:projectId" element={<Info />} />
-            <Route exact path="/Dashboard" element={<Dashboard />} />
+            <Route exact path="/Dashboard/:projectId" element={<Dashboard />} />
             <Route exact path="/Ethereum" element={<Ethereum />} />
             <Route exact path="/ConnectWallet" element={<ConnectWallet />} />
             <Route exact path="/RegistrationFlow/new" element={<RegistrationFlow />}/>
@@ -76,9 +82,12 @@ function App() {
             <Route exact path="/Main" element={<Main />} />
             <Route exact path="/MainBlack" element={<MainBlack />} />
             {/* pages with no content */}
-            <Route exact path="/Participants" element={<Participants />} />
+            <Route exact path="/Participants/:projectId" element={<Participants />} />
             <Route exact path="/Settings" element={<Settings />} />
-            <Route exact path="/Collabs" element={<Collabs />} />
+            <Route exact path="/Collabs/:projectId" element={<Collabs />} />
+            <Route exact path="/Collabs/:projectId/create" element={<CollabsNew />} />
+            <Route exact path="/Collabs/:projectId/:collabId/edit" element={<CollabsEdit />} />
+
             <Route exact path="/:slug" element={<Main />} />
           </Routes>
         }
@@ -88,3 +97,4 @@ function App() {
 }
 
 export default App;
+
