@@ -4,6 +4,7 @@ import "./assets/scss/_styles.scss";
 import "./assets/css/tailwind.css";
 import "./assets/scss/app.scss";
 import Main from "./pages/Main";
+import MainCollab from "./pages/MainCollab";
 import Info from "./pages/Info";
 import "../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import Dashboard from "./pages/Dashboard";
@@ -60,6 +61,7 @@ function App() {
           <Routes>
             <Route exact path="/" element={<Ethereum />} />
             <Route exact path="/:slug" element={<Main />} />
+            <Route exact path="/:slug-:collab" element={<MainCollab />} />
             <Route exact path="/Projects" element={<Projects />} />
             <Route exact path="/Info/new" element={<Info />} />
             <Route exact path="/Info/:projectId" element={<Info />} />

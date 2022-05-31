@@ -111,9 +111,11 @@ const Collabs = () => {
                       <img src={pen} alt="" /> Edit
                     </button>
                     </NavLink>
+                    <NavLink to={"/" + slug + "-" + collab.name} target="_blank">
                     <button className="collabs__block-top-right-view">
                       <i className="icon-link"></i>View Offer Page
                     </button>
+                    </NavLink>
                   </div>
                 </div>
                 <div className="collabs__block-bot">

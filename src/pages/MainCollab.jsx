@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState, useLayoutEffect } from "react";
 
 import ttw from "../assets/images/tiktokw.svg";
 import tipndo from "../assets/images/tipndo.png";
-import { getProjectDetail } from "../service/actions";
+import { getSlugCollabDetail } from "../service/actions";
 import { API_BASE, ASSET_BASE } from "../service/config";
 import ava from "../assets/images/infoAva.svg";
 import infoBg from "../assets/images/infoBg.png";
@@ -37,7 +37,7 @@ const web3Modal = new Web3Modal({
   providerOptions, // required
 });
 
-const Main = () => {
+const MainCollab = () => {
   const {
     account,
     setAccount,
@@ -51,10 +51,10 @@ const Main = () => {
     setConnected,
   } = React.useContext(WalletContext);
 
-  const { slug } = useParams();
-
+  const { slug, collab } = useParams();
   // form data state
-  const [formData, setformData] = useState({    
+  const [formData, setformData] = useState({ 
+    collab: {}   
   }); 
   const [provider, setProvider] = useState();
   const [library, setLibrary] = useState();
@@ -123,10 +123,10 @@ const Main = () => {
   // ============================================================= //
 
   useEffect(() => {
-    getProjectDetail(slug)
+    console.log("I start projet");
+    getSlugCollabDetail(slug, collab)
     .then(res=>res.json())
     .then(res=>{
-      console.log(res);
       if(res.main_color == "black")
       {
         window.document.getElementsByTagName("html")[0].style.backgroundColor = "black";
@@ -151,11 +151,13 @@ const Main = () => {
       >
         <div className={`${formData.main_color == 'black' ? 'black' : ''} main__logo mobile`}>
           <img className="img-rounded" src={formData.image ? `${ASSET_BASE}/${formData.image}` : ava} alt="" />
+          <img className="img-rounded img-collab" src={formData.collab.image ? formData.collab.image : ava} alt="" />
         </div>
         <div className={`${formData.main_color == 'black' ? 'black' : ''} main__content`}>
           <div className={`${formData.main_color == 'black' ? 'black' : ''} main__left`}>
             <div className={`${formData.main_color == 'black' ? 'black' : ''} main__logo`}>
               <img className="img-rounded" src={formData.image ? `${ASSET_BASE}/${formData.image}` : ava} alt="" />
+              <img className="img-rounded img-collab" src={formData.collab.image ? formData.collab.image : ava} alt="" />
             </div>
             <div className={`${formData.main_color == 'black' ? 'black' : ''} main__links`}>
               <div className={`${formData.main_color == 'black' ? 'black' : ''} main__links-title`}>{formData.name}</div>
@@ -200,7 +202,7 @@ const Main = () => {
               <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item`}>
                 <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item-inner`}>
                   <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item-top`}>Spots Available</div>
-                  <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item-bot`}> {formData.available_mint_spots == 'null' ? '' : formData.available_mint_spots} Spots</div>
+                  <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item-bot`}> {formData.collab.spots == 'null' ? '' : formData.collab.spots} Spots</div>
                 </div>
               </div>
               <div className={`${formData.main_color == 'black' ? 'black' : ''} main__item`}>
@@ -332,4 +334,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default MainCollab;

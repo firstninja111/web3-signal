@@ -233,3 +233,11 @@ export const getCollectionVerification = (wallet_address, slug, collection_name)
     body: data,
   });
 };
+
+
+/** Get Slug-Collab Public Detail */
+export const getSlugCollabDetail = (slug, collab) => {
+  return fetch(`${API_BASE}/collab/${slug}/${collab}`, {
+    method: "GET"
+  });
+};
