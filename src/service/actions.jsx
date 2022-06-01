@@ -220,7 +220,7 @@ export const deleteCollab = (wallet_address, slug, collab_id) => {
   });
 };
 
-/** Get Doodles Official */
+/** Verify collection name */
 export const getCollectionVerification = (wallet_address, slug, collection_name) => {  
   let data = new FormData();
   data.append('wallet_address', wallet_address);
@@ -239,5 +239,22 @@ export const getCollectionVerification = (wallet_address, slug, collection_name)
 export const getSlugCollabDetail = (slug, collab) => {
   return fetch(`${API_BASE}/collab/${slug}/${collab}`, {
     method: "GET"
+  });
+};
+
+
+/** Export in pick winners */
+export const winnerExport = (wallet_address, slug, winners, waiting) => {  
+  let data = new FormData();
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
+  data.append('winners', winners);
+  data.append('waiting', waiting);
+
+
+  return fetch(`${API_BASE}/export`, {
+    method: "POST",
+    mode: "cors",
+    body: data,
   });
 };

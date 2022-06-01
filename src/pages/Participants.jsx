@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import Header from "../components/Header";
 import ava from "../assets/images/Avatar.svg";
 import Title from "../components/Title";
-import { getParticipants, getProjectInfo, deleteParticipant } from "../service/actions";
+import { getParticipants, getProjectInfo, deleteParticipant, getCollabs, winnerExport } from "../service/actions";
 import WalletContext from "../context/WalletContext";
 import { useParams } from "react-router-dom";
 
@@ -12,8 +12,11 @@ const Participants = () => {
   const [tab, setTab] = useState(1);
   const {account} = useContext(WalletContext);
   const [participants, setParticipants] = useState(initialArray);
+  const [collabs, setCollabs] = useState(initialArray);
   const [slug, setSlug] = useState();
   const { projectId } = useParams();
+  const [winners, setWinners] = useState('0');
+  const [waiting, setWaiting] = useState('0');
   
   const ToggleSwitchmore = () => {
     more ? setmore(false) : setmore(true);
@@ -50,6 +53,34 @@ const Participants = () => {
     }
   };
 
+  const exportCSV = (type) => {
+    console.log("Hello");
+    winnerExport(account, slug, winners, waiting).then(res=>res.json())
+    .then(res => {
+      if(res.success == true){
+          const url = (type == 'winner' ? res.winner_link : res.waiting_link);          
+          const link = document.createElement('a');
+          console.log(link);
+          link.href = url;
+          link.setAttribute(
+            'download',
+            (type == 'winner' ? 'Winner.csv' : 'Waiting.csv'),
+          );
+
+          // Append to html link element page
+          document.body.appendChild(link);
+
+          // Start download
+          link.click();
+
+          // Clean up and remove the link
+          link.parentNode.removeChild(link);
+          setmore(false);
+      } 
+    })
+
+  }
+
   useEffect(() => {
     if(!projectId || projectId == undefined) 
       return;
@@ -70,14 +101,32 @@ const Participants = () => {
               _participants.push(res[i]);
               i++;
             }
-            console.log(_participants);
+            // console.log(_participants);
             setParticipants(_participants);
           } else {
             setParticipants([]);
           }
         })
+
+      getCollabs(account, _slug).then(res=>res.json())
+        .then(res=>{
+          if(res.status == 'success')
+          {
+            let i = 0;
+            let _collabs = [];
+            while(res.hasOwnProperty(i)){
+              _collabs.push(res[i]);
+              i++;
+            }
+            // console.log(_collabs);
+            setCollabs(_collabs);
+          }
+        })
+        
     });
   }, [projectId]);
+
+
 
   // useEffect(() => {
   //   document.addEventListener("click", handlemoreToggle);
@@ -207,15 +256,15 @@ const Participants = () => {
             <div className="participants__winners-inputs-wrapper">
               <div className="participants__winners-inputs">
                 <div className="input-container">
-                  <div className="input-container__title">How many?</div>
+                  <div className="input-container__title">Winners</div>
                   <div className="input-container__input">
-                    <input type="text" placeholder="0" />
+                    <input type="text" placeholder="0" onChange={(e)=>{setWinners(e.target.value)}}/>
                   </div>
                 </div>
                 <div className="input-container">
-                  <div className="input-container__title">How many?</div>
+                  <div className="input-container__title">Waiting</div>
                   <div className="input-container__input">
-                    <input type="text" placeholder="0" />
+                    <input type="text" placeholder="0" onChange={(e)=>{setWaiting(e.target.value)}}/>
                   </div>
                 </div>
               </div>
@@ -239,59 +288,23 @@ const Participants = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
-                  <tr>
-                    <td>Jane Cooper</td>
-                    <td>12</td>
-                    <td>12</td>
-                    <td>10</td>
-                    <td>12</td>
-                    <td>12</td>
-                  </tr>
+                  {
+                    collabs.map((collab, key) => {
+                      return <tr key={key}>
+                        <td>{collab.name}</td>
+                        <td>{collab.spots}</td>
+                        <td>{collab.entries}</td>
+                        <td>{collab.spot_used}</td>
+                        <td>{collab.over}</td>
+                        <td>{collab.winners}</td>
+                      </tr>
+                    })
+                  }
                 </tbody>
               </table>
             </div>
             <div className="participants__winners-bottom">
-              <button className="signup__btn">Save Settings</button>
+              {/* <button className="signup__btn">Save Settings</button> */}
               <div className="participants__select" ref={moreRef}>
                 <div
                   className="participants__select-btn"
@@ -307,8 +320,8 @@ const Participants = () => {
                     more ? "active" : ""
                   }`}
                 >
-                  <button>Full CSV</button>
-                  <button>Plain Text Wallet List</button>
+                  <button onClick={()=>{exportCSV('winner')}}>Winner CSV</button>
+                  <button onClick={()=>{exportCSV('waiting')}}>Waiting CSV</button>
                 </div>
               </div>
             </div>

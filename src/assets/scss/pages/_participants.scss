@@ -45,6 +45,7 @@
 
   &__select {
     position: relative;
+    margin-top:20px;
 
     &-btn {
       font-weight: 500;
@@ -282,6 +283,7 @@
     &-bottom {
       display: flex;
       align-items: flex-end;
+      justify-content: flex-end;
     }
     &-inputs {
       display: flex;
