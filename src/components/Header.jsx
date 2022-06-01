@@ -11,7 +11,7 @@ import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import WalletConnect from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
-import { register } from "../service/actions";
+import { getProjectInfo, register } from "../service/actions";
 
 import getWeb3 from "../getWeb3";
 
@@ -37,7 +37,7 @@ const web3Modal = new Web3Modal({
 });
 
 const Header = (props) => {
-  const { connectToWalletButton, setConnectToWalletButton, updateStatus } = props;
+  const { connectToWalletButton, setConnectToWalletButton, updateStatus, projectId } = props;
   const {
     account,
     setAccount,
@@ -58,6 +58,7 @@ const Header = (props) => {
   const [provider, setProvider] = useState();
   const [library, setLibrary] = useState();
   const [network, setNetwork] = useState();
+  const [projectInfo, setProjectInfo] = useState({});
 
   const disconnect = async () => {
     setConnected(false);
@@ -158,8 +159,16 @@ const Header = (props) => {
   }, [provider]);
 
   useEffect(() => {
-    //console.log("Wallet connected: ", connected);
-  }, []);
+    if(!projectId || projectId == undefined) {
+      return;
+    }
+    getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{
+      //console.log(res);
+      setProjectInfo(res);
+    });
+  }, [projectId]);
 
   const ToggleSwitchmore = () => {
     more ? setmore(false) : setmore(true);
@@ -254,7 +263,7 @@ const Header = (props) => {
       ) : (
         <div className="header__bot">
           <div className="header__bot-inner center-block">
-            <div className="header__bot-title">Azuki</div>
+            <div className="header__bot-title">{projectInfo.name}</div>
             <div
               className={`header__bot-more ${more ? "active " : ""}`}
               onClick={ToggleSwitchmore}

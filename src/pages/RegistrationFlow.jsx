@@ -346,11 +346,11 @@ const RegistrationFlow = () => {
                         </button>
                       </div>
                     </div> */}
-                    <div className="registration__wallet-add">
+                    {/* <div className="registration__wallet-add">
                       <span>
                         <i className="icon-plus"></i>Add new Collection
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 <div className="registration__heading">
@@ -501,9 +501,6 @@ const RegistrationFlow = () => {
                       className="registration__twitter-check"
                       style={{ padding: "0" }}
                     >
-                      <div className="registration__twitter-checkbox">
-                        <input type="checkbox" />
-                      </div>
                       <div className="registration__twitter-info">
                         <div className="registration__twitter-info-title">
                           Discord Verification
