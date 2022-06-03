@@ -6,6 +6,7 @@ import WalletContext from "../context/WalletContext";
 import {getAllProjects, makeDuplicateProject, removeProject} from "../service/actions";
 import {ASSET_BASE} from "../service/config";
 import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
 
 const Projects = () => {
   const [more, setmore] = useState(null);
@@ -42,7 +43,14 @@ const Projects = () => {
   }
 
   const deleteProject = (projectId) => {
-    if(window.confirm('Do you want to remove this project?')){
+    swal({
+      title: "Are you sure?",
+      text: "Do you want to remove this project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
       removeProject(projectId, account).then(res => res.json()).then(res => {
         if (res.result) {
           getAllProjects(account).then(res => res.json()).then(res => {
@@ -50,20 +58,27 @@ const Projects = () => {
           })
         }
       })  
-    }
+    });
   }
 
   const duplicateProject = (projectId) => {
-    if(window.confirm('Do you want to duplicate this project?')){
+    swal({
+      title: "Are you sure?",
+      text: "Do you want to duplicate this project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
       makeDuplicateProject(projectId).then(res => res.json()).then(res => {
         if(res.status == "success") {
-          alert("Successfully Duplicated");
+          swal("Success!", "Successfully Duplicated", "success");
           getAllProjects(account).then(res => res.json()).then(res => {
             setProjects(res);
           })
         }
       })
-    }
+    });
   }
 
   return (

@@ -8,6 +8,8 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import WalletContext from "../context/WalletContext";
 import { useNavigate } from "react-router-dom";
 import { getProjectInfo, createProject, saveProject } from "../service/actions";
+import swal from "sweetalert";
+
 
 const RegistrationFlow = () => {
   const [switchInput, setSwitchInput] = useState("");
@@ -35,7 +37,7 @@ const RegistrationFlow = () => {
 
   const onSubmit = () => {
     if(!account){
-      alert('Please login first');
+      swal("Warning!", "Please login first", "warning");
       return;
     }
     
@@ -45,7 +47,14 @@ const RegistrationFlow = () => {
       let _formData = {...formData, "wallet_address": account};
       //console.log(_formData);
 
-      if(window.confirm('Do you want to create new project?')){
+      swal({
+      title: "Are you sure?",
+      text: "Do you want to create new project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
@@ -53,18 +62,25 @@ const RegistrationFlow = () => {
             navigate('/projects');
           })
         localStorage.removeItem("formData");
-      }
+      });
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
-      if(window.confirm('Do you want to update project info?')){
+      swal({
+        title: "Are you sure?",
+        text: "Do you want to create new project?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
         saveProject(projectId, _formData)
           .then(res=>res.json())
           .then(res=>{
             if(res.status == "ok"){
-              alert('Saved successfully');
+              swal("Success!", "Saved successfully", "success");
             }
           })
-      }
+      });
     }
   }
 
@@ -230,9 +246,9 @@ const RegistrationFlow = () => {
                         </div>
                       </div>
                       <div className="registration__wallet-collection-item-wrapper">
-                        <button className="registration__wallet-collection-img">
+                        {/* <button className="registration__wallet-collection-img">
                           <img src={trash} alt="" />
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                     <div className="registration__wallet-collection-item">
@@ -290,9 +306,9 @@ const RegistrationFlow = () => {
                         </div>
                       </div>
                       <div className="registration__wallet-collection-item-wrapper">
-                        <button className="registration__wallet-collection-img">
+                        {/* <button className="registration__wallet-collection-img">
                           <img src={trash} alt="" />
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                     {/* <div className="registration__wallet-collection-item">
@@ -720,15 +736,15 @@ const RegistrationFlow = () => {
                         field here.
                       </div>
                     </div>
-                    <button className="registration__custom-inner-img">
+                    {/* <button className="registration__custom-inner-img">
                       <img src={trash} alt="" />
-                    </button>
+                    </button> */}
                   </div>
-                  <div className="registration__custom-add">
+                  {/* <div className="registration__custom-add">
                     <button>
                       <i className="icon-plus"></i>Add new field
                     </button>
-                  </div>
+                  </div> */}
                 </div>
                 <button className="registration__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
               </div>

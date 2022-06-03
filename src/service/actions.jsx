@@ -137,10 +137,10 @@ export const checknft = (address) => {
 /** Get participants */
 export const getParticipants = async (wallet_address, slug) => {
   let data = new FormData();
-  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
-  // data.append("slug", "devtest");
-  data.append('wallet_address', wallet_address);
-  data.append('slug', slug);
+  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  data.append("slug", "devtest");
+  // data.append('wallet_address', wallet_address);
+  // data.append('slug', slug);
 
   return await fetch(`${API_BASE}/participants`, {
     method: "POST",
@@ -163,7 +163,34 @@ export const deleteParticipant = (wallet_address, slug, participant_id) => {
   });
 };
 
+/** Search Participants */
+export const searchParticipant = (wallet_address, slug, query) => {
+  let data = new FormData();
+  // data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  // data.append("slug", "devtest");
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
+  data.append('query', query);
+  
+  return fetch(`${API_BASE}/searchparticipants`, {
+    method: "POST",
+    body: data,
+  });
+};
 
+/** Export in pick winners */
+export const participantExport = (wallet_address, slug, query) => {  
+  let data = new FormData();
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
+  data.append('query', query);
+
+  return fetch(`${API_BASE}/exportpartipant`, {
+    method: "POST",
+    mode: "cors",
+    body: data,
+  });
+};
 
 /** Update Collab */
 export const editCollab = (wallet_address, slug, collabId, name, spots, selection_method, message) => {
@@ -253,6 +280,35 @@ export const winnerExport = (wallet_address, slug, winners, waiting) => {
 
 
   return fetch(`${API_BASE}/export`, {
+    method: "POST",
+    mode: "cors",
+    body: data,
+  });
+};
+
+/** Channel Performance */
+export const getPerformances = (wallet_address, slug, winners, waiting) => {  
+  let data = new FormData();
+  // data.append('wallet_address', wallet_address);
+  // data.append('slug', slug);
+  data.append("wallet_address", "0x722bd4163771851b847de0a69cf7190d747c62da");
+  data.append("slug", "devtest");
+
+  return fetch(`${API_BASE}/performances`, {
+    method: "POST",
+    mode: "cors",
+    body: data,
+  });
+};
+
+/** Channel Performance */
+export const addTeam = (wallet_address, slug, address) => {  
+  let data = new FormData();
+  data.append('wallet_address', wallet_address);
+  data.append('slug', slug);
+  data.append('address', address);
+
+  return fetch(`${API_BASE}/team`, {
     method: "POST",
     mode: "cors",
     body: data,

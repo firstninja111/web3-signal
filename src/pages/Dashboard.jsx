@@ -22,10 +22,11 @@ import time from "../assets/images/time.svg";
 import users from "../assets/images/userss.svg";
 
 import { useParams } from "react-router-dom";
-import { getProjectInfo, getStats, getParticipants, getVisits, deleteParticipant } from "../service/actions";
+import { getProjectInfo, getStats, getParticipants, getVisits, deleteParticipant, getPerformances } from "../service/actions";
 import { useContext, useState, useEffect } from "react";
 import WalletContext from "../context/WalletContext";
-
+import { filterMatches } from "web3modal";
+import swal from "sweetalert";
 
 const Dashboard = () => {
   // pass the correct data for the chart
@@ -36,6 +37,8 @@ const Dashboard = () => {
   const [data, setData] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [slug, setSlug] = useState();
+  const [performances, setPerformances] = useState({});
+  const [paFilter, setPaFilter] = useState('');
 
   const getProjectData = async(projectId) => {
     let _slug;
@@ -46,7 +49,7 @@ const Dashboard = () => {
     });
     return _slug;
   }
-
+  
   useEffect(() => {
     
     if(!projectId || projectId == undefined) {
@@ -66,21 +69,28 @@ const Dashboard = () => {
 
       getVisits(account, _slug).then(res=>res.json())
         .then(res=> {
+          console.log(res);
           if(res.status == "success")
           {
-            let i = 0;
-            let _visits = [];
-            while(res.hasOwnProperty(i)){
-              // console.log(res[i]);
+            let _data = [];
+            for(let i = 0; i < 7; i ++ ){
               let graph = {
-                name: res[i].date.substring(0, 10),
-                visites: res[i].number,
+                name: res.days[i],
+                signup: res.signup[i],
+                visits: res.visits[i],
               }
-              _visits.push(graph);
-              i++;
+              _data.push(graph);
             }
-            // console.log(_visits);
-            setData(_visits);
+            setData(_data);
+          }
+        })
+
+      getPerformances(account, _slug).then(res=>res.json())
+        .then(res=> {
+          if(res.status == "success")
+          {
+            console.log(res.email[0]);
+            setPerformances(res);
           }
         })
 
@@ -102,38 +112,23 @@ const Dashboard = () => {
   }, [projectId]);
 
   const removeParticipant = (participant_id) => {
-    if(!window.confirm('Do you want to delete participant?'))
-      return;
-      
-    deleteParticipant(account, slug, participant_id).then(res=>res.json())
+    swal({
+      title: "Are you sure?",
+      text: "Do you want to remove participant?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      deleteParticipant(account, slug, participant_id).then(res=>res.json())
       .then(res => {
          if(res.status == 'true')
          {
            window.location.reload();
          }
       })
+    });
   }
-
-  // const data = [
-  //   {
-  //     name: "2022-05-12",
-  //     visites: 4,
-  //     // pv: 2400,
-  //     // amt: 2400,
-  //   },
-  //   {
-  //     name: "2022-05-17",
-  //     visites: 2,
-  //     // pv: 1398,
-  //     // amt: 2210,
-  //   },
-  //   {
-  //     name: "2022-05-27",
-  //     visites: 1,
-  //     // pv: 9800,
-  //     // amt: 2290,
-  //   },
-  // ];
 
   const getAbbrWalletAddress = (walletAddress) => {
     let abbrWalletAddress =
@@ -142,6 +137,8 @@ const Dashboard = () => {
   };
 
   const getDateTimeFormat = (dateTime) => {
+    if(dateTime == null)
+      return "";
     let abbrDate = 
       dateTime.substring(0, 10) + " " + dateTime.substring(11, 19);
 
@@ -150,7 +147,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="dashboard__inner">
         <div className="center-block">
           <div className="dashboard__top">
@@ -208,7 +205,9 @@ const Dashboard = () => {
                       stroke="#8884d8"
                       activeDot={{ r: 8 }}
                     /> */}
-                    <Line type="monotone" dataKey="visites" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="visits" stroke="#82ca9d" activeDot={{ r: 4 }}/>
+                    <Line type="monotone" dataKey="signup" stroke="#8884d8" activeDot={{ r: 4 }}/>
+
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -235,10 +234,10 @@ const Dashboard = () => {
                     </div>
                     <div className="dashboard__performance-item-bot">
                       <div className="dashboard__performance-item-inner">
-                        100
+                        {performances.email ? performances.email[0] : ''}
                       </div>
                       <div className="dashboard__performance-item-inner">
-                        1092
+                        {performances.email ? performances.email[1] : ''}
                       </div>
                     </div>
                   </div>
@@ -253,10 +252,10 @@ const Dashboard = () => {
                     </div>
                     <div className="dashboard__performance-item-bot">
                       <div className="dashboard__performance-item-inner">
-                        200
+                        {performances.twitter ? performances.twitter[0] : ''}
                       </div>
                       <div className="dashboard__performance-item-inner">
-                        2999
+                        {performances.twitter ? performances.twitter[1] : ''}
                       </div>
                     </div>
                   </div>
@@ -271,10 +270,10 @@ const Dashboard = () => {
                     </div>
                     <div className="dashboard__performance-item-bot">
                       <div className="dashboard__performance-item-inner">
-                        600
+                        {performances.facebook ? performances.facebook[0] : ''}
                       </div>
                       <div className="dashboard__performance-item-inner">
-                        1922
+                        {performances.facebook ? performances.facebook[1] : ''}
                       </div>
                     </div>
                   </div>
@@ -289,10 +288,10 @@ const Dashboard = () => {
                     </div>
                     <div className="dashboard__performance-item-bot">
                       <div className="dashboard__performance-item-inner">
-                        120
+                        {performances.reddit ? performances.reddit[0] : ''}
                       </div>
                       <div className="dashboard__performance-item-inner">
-                        890
+                        {performances.reddit ? performances.reddit[1] : ''}
                       </div>
                     </div>
                   </div>
@@ -307,10 +306,10 @@ const Dashboard = () => {
                     </div>
                     <div className="dashboard__performance-item-bot">
                       <div className="dashboard__performance-item-inner">
-                        235
+                        {performances.linkedin ? performances.linkedin[0] : ''}
                       </div>
                       <div className="dashboard__performance-item-inner">
-                        765
+                        {performances.linkedin ? performances.linkedin[1] : ''}
                       </div>
                     </div>
                   </div>
@@ -327,13 +326,15 @@ const Dashboard = () => {
                 </button>
                 <div className="dashboard__bottom-header-search">
                   <img src={search} alt="" />
-                  <input type="search" placeholder="Search" />
+                  <input type="search" placeholder="Search" onKeyUp={(event) => {setPaFilter(event.target.value)}}/>
                 </div>
               </div>
             </div>
             <div className="dashboard__bottom-items">
               {
-                participants.map((participant, key) => {
+                participants.filter(element => {
+                  return element.discord_username.includes(paFilter) || element.twitter_username.includes(paFilter);
+                }).map((participant, key) => {
                   return <div className="dashboard__bottom-item" key={key}>
                     <div className="dashboard__bottom-item-inner">
                       <div className="dashboard__bottom-item-title">
@@ -344,10 +345,14 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="dashboard__bottom-item-inner">
+                    <div className="dashboard__bottom-item-link">
+                        {participant.twitter_username}
+                      </div>
+                      {/* 
                       <div className="dashboard__bottom-item-title">{participant.twitter_username}</div>
                       <div className="dashboard__bottom-item-subtitle">
                         <img src={users} alt="" />1
-                      </div>
+                      </div> */}
                     </div>
                     <div className="dashboard__bottom-item-inner">
                       <div className="dashboard__bottom-item-link">

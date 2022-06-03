@@ -13,12 +13,14 @@ const Collabs = () => {
   const {account} = useContext(WalletContext);
   const [collabs, setCollabs] = useState([]);
   const [spotsTotal, setSpotsTotal] = useState(0);
+  const [projectInfo, setProjectInfo] = useState({});
 
   const getProjectData = async(projectId) => {
     let _slug;
     await getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{      
+      setProjectInfo(res);
       _slug = res.slug;
     });
     return _slug;
@@ -54,7 +56,7 @@ const Collabs = () => {
 
   return (
     <div>
-      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="collabs ">
         <div className="collabs__inner center-block">
           <div className="collabs__top">

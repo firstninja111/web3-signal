@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import WalletContext from "../context/WalletContext";
 import { useNavigate } from "react-router-dom";
 import { getProjectInfo, createProject, saveProject } from "../service/actions";
+import swal from "sweetalert";
 
 const Message = () => {
   const { projectId } = useParams();
@@ -32,7 +33,7 @@ const Message = () => {
 
   const onSubmit = () => {
     if(!account){
-      alert('Please login first');
+      swal("Warning!", "Please login first", "warning");
       return;
     }
     
@@ -41,7 +42,14 @@ const Message = () => {
     if(projectId == undefined){ // Form Submit for Create
       let _formData = {...formData, "wallet_address": account};
       //console.log(_formData);
-      if(window.confirm('Do you want to create new project?')){
+      swal({
+      title: "Are you sure?",
+      text: "Do you want to create new project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
@@ -50,19 +58,26 @@ const Message = () => {
           })
 
         localStorage.removeItem("formData");
-      }
+      });
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
 
-      if(window.confirm('Do you want to update project info?')){
+      swal({
+        title: "Are you sure?",
+        text: "Do you want to create new project?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
         saveProject(projectId, _formData)
           .then(res=>res.json())
           .then(res=>{
             if(res.status == "ok"){
-              alert('Saved successfully');
+              swal("Success!", "Saved successfully", "success");
             }
           })
-      }
+      });
     }
   }
 

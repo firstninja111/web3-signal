@@ -28,6 +28,7 @@
     "react-scripts": "^4.0.3",
     "recharts": "^2.1.9",
     "sass": "^1.51.0",
+    "sweetalert": "^2.1.2",
     "user-event": "^4.0.0",
     "web3": "^1.7.3",
     "web3modal": "^1.9.7",

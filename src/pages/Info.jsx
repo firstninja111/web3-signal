@@ -14,6 +14,8 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { ASSET_BASE } from "../service/config";
 import { convertDateStringToDateTime } from "../service/util";
 import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
+
 
 const Info = (props) => {
   const { projectId } = useParams();
@@ -88,32 +90,46 @@ const Info = (props) => {
 
   const onSubmit = () => {
     if(!account){
-      alert('Please login first');
+      swal("Warning!", "Please login first", "warning");
       return;
     }
     if(projectId == undefined){ // Form Submit for Create
       let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
       
-      if(window.confirm('Do you want to create new project?')){
+      swal({
+      title: "Are you sure?",
+      text: "Do you want to create new project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
             //console.log(res);
             navigate('/projects');
           })
-      }
+      });
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
 
-      if(window.confirm('Do you want to update project info?')){
+      swal({
+        title: "Are you sure?",
+        text: "Do you want to create new project?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
         saveProject(projectId, _formData)
           .then(res=>res.json())
           .then(res=>{
             if(res.status == "ok"){
-              alert('Saved successfully');
+              swal("Success!", "Saved successfully", "success");
             }
           })
-      }
+      });
     }
 
     localStorage.removeItem("formData");

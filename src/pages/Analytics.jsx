@@ -178,7 +178,7 @@ const Analytics = () => {
                   registered for your PREMINT list.
                 </div>
                 <a href="/" className="analytics__endpoints-error">
-                  https://api.premint.xyz/v1/ae8bf85e47d24f7c53b04e73e0015a6289960750abdd6e1d839847fe18155daa/
+                  https://api.alphaspot.xyz/v1/ae8bf85e47d24f7c53b04e73e0015a6289960750abdd6e1d839847fe18155daa/
                 </a>
                 <button className="analytics__endpoints-btn">Open</button>
               </div>

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import SideBar from "../components/SideBar";
 import Title from "../components/Title";
+import swal from "sweetalert";
 
 import { useParams } from "react-router-dom";
 import WalletContext from "../context/WalletContext";
@@ -22,47 +23,87 @@ const Transparency = () => {
   const [formData, setformData] = useState({
   });
 
-  const handleChange = (ev) =>{
-    let _name = ev.target.name;
-    let _val = ev.target.value;
-    setformData({...formData, [_name]: _val});
-  }
+  // const handleChange = (ev) =>{
+  //   let _name = ev.target.name;
+  //   let _val = ev.target.value;
+  //   setformData({...formData, [_name]: _val});
+  // }
 
   const onSubmit = () => {
-    // if(!account){
-    //   alert('Please login first');
-    //   return;
-    // }
-    
-    // const now = new Date();
+    if(!account){
+      swal("Warning!", "Please login first", "warning");
+      return;
+    }
 
-    // if(projectId == undefined){ // Form Submit for Create
-    //   let _formData = {...formData, "wallet_address": account};
-    //   if(window.confirm('Do you want to create new project?')){
-    //     createProject(_formData)
-    //       .then(res=>res.json())
-    //       .then(res=>{
-    //         //console.log(res);
-    //         navigate('/projects');
-    //       })
-    //   }
-    // } else { // Form Submit for Update
-    //   let _formData = {...formData, "wallet_address": account};
-    //   if(window.confirm('Do you want to update project info?')){
-    //     saveProject(projectId, _formData)
-    //       .then(res=>res.json())
-    //       .then(res=>{
-    //         if(res.status == "ok"){
-    //           alert('Saved successfully');
-    //         }
-    //       })
-    //   }
-    // }
+    if(projectId == undefined){ // Form Submit for Create
+      let _formData = {...formData, "wallet_address": account};
+      swal({
+      title: "Are you sure?",
+      text: "Do you want to create new project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+        createProject(_formData)
+          .then(res=>res.json())
+          .then(res=>{
+            navigate('/projects');
+          })
+      });
+    } else { // Form Submit for Update
+      let _formData = {...formData, "wallet_address": account};
+      swal({
+        title: "Are you sure?",
+        text: "Do you want to create new project?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        saveProject(projectId, _formData)
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.status == "ok"){
+              swal("Success!", "Saved successfully", "success");
+            }
+          })
+      });
+    }
   }
   
+
+  useEffect(()=>{
+    if(!projectId || projectId == undefined) {
+      var initialObj = {
+        public_wallet_list: 0,
+        public_winner_list: 0,
+      };
+      var storageObject = JSON.parse(localStorage.getItem("formData"));
+      setformData({...initialObj, ...storageObject});
+
+      setSwitchInput((!storageObject || !storageObject.hasOwnProperty('public_wallet_list') || storageObject.public_wallet_list != 1) ? "" : "switcher");
+      setSwitchInput2((!storageObject || !storageObject.hasOwnProperty('public_winner_list') || storageObject.public_winner_list != 1) ? "" : "switcherDS");
+      return;
+    }
+    getProjectInfo(projectId)
+    .then(res=>res.json())
+    .then(res=>{
+      //console.log(res);
+      setProjectInfo(res);
+      setformData({
+        public_wallet_list: res.public_wallet_list,
+        public_winner_list: res.public_winner_list,
+      });
+      setSwitchInput(res.public_wallet_list == 1 ? "switcher" : "");
+      setSwitchInput2(res.public_winner_list == 1 ? "switcherDS" : "");
+    });
+  }, [projectId]);
+
+
   return (
     <>
-      <Header projectId={projectId} header={projectId == undefined}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="App__inner">
         <div className="App__inner-content center-block">
           <div className="App__sidebar">
@@ -88,12 +129,21 @@ const Transparency = () => {
                         id="switcher"
                         className="inputSwitch-input"
                         onChange={(n) => {
+                          let _val;
                           if (swirchInput) {
                             setSwitchInput("");
+                            setformData({...formData, public_wallet_list: 0});
+                            _val = 0;
                           } else {
                             setSwitchInput(n.target.id);
+                            setformData({...formData, public_wallet_list: 1});
+                            _val = 1;
                           }
+                          let storageFormData = JSON.parse(localStorage.getItem("formData"));
+                          const object = {...storageFormData,  public_wallet_list: _val};
+                          localStorage.setItem("formData", JSON.stringify(object));
                         }}
+                        checked={formData.public_wallet_list == 1 ? 'checked' : ''}
                       />
                       <label htmlFor="switcher" className="inputSwitch-label">
                         Toggle
@@ -105,7 +155,7 @@ const Transparency = () => {
                   <div className="transparency__bottom-text text">
                     Public list of winners will be displayed at
                     <i className="icon-link"></i>
-                    <span>https://premint.xyz/waffeles/winners/</span>
+                    <span>https://alphaspot.xyz/waffeles/winners/</span>
                   </div>
                 ) : (
                   ""
@@ -126,33 +176,42 @@ const Transparency = () => {
                     <div className="inputSwitch">
                       <input
                         type="checkbox"
-                        id="switch"
+                        id="switcherDS"
                         className="inputSwitch-input"
                         onChange={(n) => {
+                          let _val;
                           if (swirchInput2) {
                             setSwitchInput2("");
+                            setformData({...formData, public_winner_list: 0});
+                            _val = 0;
                           } else {
                             setSwitchInput2(n.target.id);
+                            setformData({...formData, public_winner_list: 1});
+                            _val = 1;
                           }
+                          let storageFormData = JSON.parse(localStorage.getItem("formData"));
+                          const object = {...storageFormData,  public_winner_list: _val};
+                          localStorage.setItem("formData", JSON.stringify(object));
                         }}
+                        checked={formData.public_winner_list == 1 ? 'checked' : ''}
                       />
-                      <label htmlFor="switch" className="inputSwitch-label">
+                      <label htmlFor="switcherDS" className="inputSwitch-label">
                         Toggle
                       </label>
                     </div>
                   </div>
                 </div>
-                {swirchInput2 === "switch" ? (
+                {swirchInput2 === "switcherDS" ? (
                   <div className="transparency__bottom-text text">
                     Public list of winners will be displayed at
                     <i className="icon-link"></i>
-                    <span>https://premint.xyz/waffeles/winners/</span>
+                    <span>https://alphaspot.xyz/waffeles/winners/</span>
                   </div>
                 ) : (
                   ""
                 )}
               </div>
-              <button className="transparency__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
+              <button className="signup__btn" type="button" onClick={onSubmit}>{projectId == undefined ? 'Create Project' : 'Update Project'}</button>
             </div>
           </div>
         </div>

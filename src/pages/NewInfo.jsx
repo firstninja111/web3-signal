@@ -11,7 +11,7 @@ import { getAllProjects, getProjectInfo, createProject } from "../service/action
 import WalletContext from "../context/WalletContext";
 import { convertDateStringToDateTime } from "../service/util";
 import { useNavigate } from "react-router-dom";
-
+import swal from "sweetalert";
 
 const NewInfo = (props) => {
   // take draft to get Draft js value
@@ -71,7 +71,7 @@ const NewInfo = (props) => {
 
   const onSubmit = () => {
     if(!account){
-      alert('Please login first');
+      swal("Warning!", "Please login first", "warning");
       return;
     }
     let _formData = {...formData, "description": draftHtml, "wallet_address": account, raffle_time: convertDateStringToDateTime(formData.raffle_time)};
@@ -80,12 +80,6 @@ const NewInfo = (props) => {
     createProject(_formData)
     .then(res=>res.json())
     .then(res=>{
-      //console.log(res);
-      // alert('Successfully saved');
-      //   setFormData({
-      //     raffle_time: new Date(), 
-      //     main_color: '#000000'
-      // });
       navigate('/info/' + res.id);
     })
   }

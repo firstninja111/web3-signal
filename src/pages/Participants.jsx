@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import Header from "../components/Header";
 import ava from "../assets/images/Avatar.svg";
 import Title from "../components/Title";
-import { getParticipants, getProjectInfo, deleteParticipant, getCollabs, winnerExport } from "../service/actions";
+import { getParticipants, getProjectInfo, deleteParticipant, getCollabs, winnerExport, participantExport } from "../service/actions";
 import WalletContext from "../context/WalletContext";
 import { useParams } from "react-router-dom";
+import swal from "sweetalert";
 
 const Participants = () => {
   const initialArray = [];
@@ -17,6 +18,8 @@ const Participants = () => {
   const { projectId } = useParams();
   const [winners, setWinners] = useState('0');
   const [waiting, setWaiting] = useState('0');
+  const [paFilter, setPaFilter] = useState('');
+  const [projectInfo, setProjectInfo] = useState({});
   
   const ToggleSwitchmore = () => {
     more ? setmore(false) : setmore(true);
@@ -29,32 +32,53 @@ const Participants = () => {
     await getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{      
+       setProjectInfo(res);
       _slug = res.slug;
     });
     return _slug;
   }
 
   const removeParticipant = (participant_id) => {
-    if(!window.confirm('Do you want to delete participant?'))
-      return;
-      
-    deleteParticipant(account, slug, participant_id).then(res=>res.json())
+    swal({
+      title: "Are you sure?",
+      text: "Do you want to remove participant?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      deleteParticipant(account, slug, participant_id).then(res=>res.json())
       .then(res => {
          if(res.status == 'true')
          {
            window.location.reload();
          }
       })
+    });
+  }
+  const fullListExport = () => {
+    participantExport(account, slug, paFilter).then(res=>res.json())
+    .then(res => {
+      if(res.success == true){
+          const url = res.participants_link;          
+          const link = document.createElement('a');
+          console.log(link);
+          link.href = url;
+          link.setAttribute(
+            'download',
+            'Participant.csv',
+          );
+
+          document.body.appendChild(link);
+          link.click();
+
+          link.parentNode.removeChild(link);
+          setmore(false);
+      } 
+    })
   }
 
-  const handlemoreToggle = (event) => {
-    if (moreRef.current && !moreRef.current.contains(event.target)) {
-      setmore(false);
-    }
-  };
-
   const exportCSV = (type) => {
-    console.log("Hello");
     winnerExport(account, slug, winners, waiting).then(res=>res.json())
     .then(res => {
       if(res.success == true){
@@ -101,7 +125,6 @@ const Participants = () => {
               _participants.push(res[i]);
               i++;
             }
-            // console.log(_participants);
             setParticipants(_participants);
           } else {
             setParticipants([]);
@@ -143,6 +166,8 @@ const Participants = () => {
   };
 
   const getDateTimeFormat = (dateTime) => {
+    if(dateTime == null)
+      return "";
     let abbrDate = 
       dateTime.substring(0, 10) + " " + dateTime.substring(11, 19);
 
@@ -151,7 +176,7 @@ const Participants = () => {
 
   return (
     <div className="participants">
-      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="participants__inner center-block">
         <div className="participants__top">
           <div className="participants__tabs">
@@ -186,8 +211,8 @@ const Participants = () => {
                   more ? "active" : ""
                 }`}
               >
-                <button>Full CSV</button>
-                <button>Plain Text Wallet List</button>
+                <button onClick={() => {fullListExport()}}>Export</button>
+                {/* <button>Plain Text Wallet List</button> */}
               </div>
             </div>
           ) : (
@@ -197,7 +222,7 @@ const Participants = () => {
         {tab === 1 ? (
           <div className="participants__list">
             <div className="participants__list-search">
-              <input type="search" placeholder="Search" />
+              <input type="search" placeholder="Search" onKeyUp={(event) => {setPaFilter(event.target.value)}}/>
             </div>
             <div className="participants__list-table">
               <table>
@@ -211,7 +236,9 @@ const Participants = () => {
                 </thead>
                 <tbody>
                   {
-                    participants.map((participant, key) => {
+                    participants.filter(element => {
+                      return element.discord_username.includes(paFilter) || element.twitter_username.includes(paFilter);
+                    }).map((participant, key) => {
                       return <tr key = {key}>
                           <td>
                             <div className="participants__list-table-wallet">

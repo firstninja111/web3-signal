@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProjectInfo, getCollab, deleteCollab, editCollab } from "../service/actions";
 import WalletContext from "../context/WalletContext";
 import { useEffect } from "react";
-
+import swal from "sweetalert";
 
 const CollabsEdit = () => {
   const {collabId, projectId} = useParams();
@@ -13,12 +13,14 @@ const CollabsEdit = () => {
   const [collabForm, setCollabForm] = useState({});
   const navigate = useNavigate();
   const [slug, setSlug] = useState();
+  const [projectInfo, setProjectInfo] = useState({});
 
   const getProjectData = async(projectId) => {
     let _slug;
     await getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{      
+        setProjectInfo(res);
       _slug = res.slug;
     });
     return _slug;
@@ -52,18 +54,24 @@ const CollabsEdit = () => {
   }
 
   const deleteCollabDetail = () => {
-    if(!window.confirm('Do you want to remove this collab?')){
-      return;
-    }
-    deleteCollab(account, slug, collabId).then(res=>res.json())
-    .then(res=>{
-      if(res.status == 'true'){
-        navigate(-1);
-      }
+    swal({
+      title: "Are you sure?",
+      text: "Do you want to remove this collab?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
     })
-    .then(err => {
-      console.log(err);
-    })
+    .then((willDelete) => {
+      deleteCollab(account, slug, collabId).then(res=>res.json())
+      .then(res=>{
+        if(res.status == 'true'){
+          navigate(-1);
+        }
+      })
+      .then(err => {
+        console.log(err);
+      })
+    });
   }
 
   const handleChange = (ev) =>{
@@ -74,7 +82,7 @@ const CollabsEdit = () => {
 
   return (
     <div>
-      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
       <div className="collabs-new detail-section">
         <div className="collabs-new__inner center-block">
           <div className="collabs-new__title">

@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getCollectionVerification, getProjectInfo, editCollab } from "../service/actions";
 import WalletContext from "../context/WalletContext";
 import { useEffect } from "react";
-
+import swal from "sweetalert";
 
 const CollabsNew = () => {
   const {projectId} = useParams();
@@ -16,12 +16,14 @@ const CollabsNew = () => {
   const [collabId, setCollabId] = useState(0);
   const [collabForm, setCollabForm] = useState({selection_method: 'Raffle'});
   const navigate = useNavigate();
+  const [projectInfo, setProjectInfo] = useState({});
 
   const getProjectData = async(projectId) => {
     let _slug;
     await getProjectInfo(projectId)
     .then(res=>res.json())
     .then(res=>{      
+      setProjectInfo(res);
       _slug = res.slug;
     });
     return _slug;
@@ -51,7 +53,7 @@ const CollabsNew = () => {
         setVerfication(true);
         setCollabForm({...collabForm, name:collectionName, logo:res.logo});
       } else {
-        alert(`Sorry, there is no colletion at https://opensea.io/collection/${collectionName}.`);
+        swal("Sorry!", `There is no colletion at https://opensea.io/collection/${collectionName}.`, "warning");
         return;
       }
       console.log('Verification Result:', res);
@@ -77,7 +79,7 @@ const CollabsNew = () => {
 
   return (
     <div>
-      <Header projectId={projectId} header={projectId == undefined} slug={slug}/>
+      <Header projectId={projectId} header={projectId == undefined} slug={projectInfo.slug}/>
 
       {
         !verification &&

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import SideBar from "../components/SideBar";
 import Title from "../components/Title";
+import swal from "sweetalert";
 
 import { useParams } from "react-router-dom";
 import WalletContext from "../context/WalletContext";
@@ -31,16 +32,23 @@ const BlackList = () => {
 
   const onSubmit = () => {
     if(!account){
-      alert('Please login first');
+      swal("Warning!", "Please login first", "warning");
       return;
     }
     
     const now = new Date();
-
+    
     if(projectId == undefined){ // Form Submit for Create
       let _formData = {...formData, "wallet_address": account};
 
-      if(window.confirm('Do you want to create new project?')){
+      swal({
+      title: "Are you sure?",
+      text: "Do you want to create new project?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
         createProject(_formData)
           .then(res=>res.json())
           .then(res=>{
@@ -48,19 +56,26 @@ const BlackList = () => {
             navigate('/projects');
           })
         localStorage.removeItem("formData");  
-      }
+      });
     } else { // Form Submit for Update
       let _formData = {...formData, "wallet_address": account};
 
-      if(window.confirm('Do you want to update project info?')){
+      swal({
+        title: "Are you sure?",
+        text: "Do you want to create new project?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
         saveProject(projectId, _formData)
           .then(res=>res.json())
           .then(res=>{
             if(res.status == "ok"){
-              alert('Saved successfully');
+              swal("Success!", "Saved successfully", "success");
             }
           })
-      }
+      });
     }
     
   }
@@ -87,7 +102,6 @@ const BlackList = () => {
       });
     });
   }, [projectId]);
-
 
   return (
     <>
